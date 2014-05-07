@@ -1,14 +1,12 @@
 # Maintainer: Can Celasun <dcelasun[at]gmail[dot]com>
 pkgname=castles-in-the-sky
 pkgver=1
-pkgrel=1
+pkgrel=2
 pkgdesc="A game by the Tall Trees"
 arch=(i686 x86_64)
 url="http://thetalltreesgames.co.uk/CastlesInTheSky/"
 license=('custom')
-depends=()
-[ "$CARCH" = i686   ] && depends=(wine)
-[ "$CARCH" = x86_64 ] && depends=(bin32-wine)
+depends=(wine)
 makedepends=(p7zip)
 _sourcefile=castlesinthesky_win_12232013.exe
 noextract=(${_sourcefile})
