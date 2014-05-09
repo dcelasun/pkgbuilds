@@ -2,7 +2,7 @@
 
 pkgname=wicd-dark-icons
 pkgver=1
-pkgrel=1
+pkgrel=2
 arch=('any')
 pkgdesc="Dark mono icons for Wicd Network Manager"
 url="http://kde-look.org/content/show.php/Alternate+Wicd+Tray+Icons?content=125921"
