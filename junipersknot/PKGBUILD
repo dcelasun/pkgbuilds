@@ -3,14 +3,13 @@
 
 pkgname=junipersknot
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 pkgdesc="A short kinetic novel crafted in a month by Dischan, Juniper's Knot is a story told from dual perspectives: that of a demon and a boy."
 arch=('any')
 url="http://junipersknot.dischan.org/"
 license=('custom')
 depends=('renpy')
-makedepends=('icoutils')
-options=(!strip !zipman)
+options=(!strip)
 source=("JunipersKnot_en_1.0_lin.tar.bz2::https://dischan.org/store/download.php?fileID=19"
 	dischan_JunipersKnot.desktop
 	python2.patch
