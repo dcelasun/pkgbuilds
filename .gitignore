@@ -7,5 +7,6 @@
 *.tar.gz
 *.tar.bz2
 *.zip
+*.tar
 # Backup files
 *~
