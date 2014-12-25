@@ -8,5 +8,6 @@
 *.tar.bz2
 *.zip
 *.tar
+*.7z
 # Backup files
 *~
