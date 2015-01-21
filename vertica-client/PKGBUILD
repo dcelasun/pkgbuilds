@@ -3,7 +3,7 @@
 pkgname=vertica-client
 pkgver=7.1.1
 _pkgver=7.1.1-0
-pkgrel=1
+pkgrel=2
 pkgdesc="Client for the Vertica Analytic Database"
 arch=('i686' 'x86_64')
 url="https://www.vertica.com/"
@@ -24,7 +24,7 @@ fi
 _vpkg=vertica-client-${_pkgver}.linux.${__vertica_arch}.tar.gz
 
 build() {
-  msg "You need a full copy of the clientin order to install it"
+  msg "You need a full copy of the client in order to install it"
   msg "You can download it here: https://my.vertica.com/download-community-edition/#clients"
   msg "Searching for ${_vpkg} in dir: \"$startdir\""
   pkgpath="$startdir"
