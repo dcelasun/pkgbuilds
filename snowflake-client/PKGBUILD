@@ -2,12 +2,12 @@
 
 pkgname=snowflake-client
 pkgver=2.4
-pkgrel=1
+pkgrel=2
 pkgdesc="Snowflake Database command line and JDBC client"
 arch=('i686' 'x86_64')
 url="http://www.snowflake.net/"
 license=('custom: commercial')
-depends=(zlib gcc-libs java-environment libtinfo)
+depends=(gcc-libs java-environment bash libtinfo)
 source=(sfsql.patch)
 md5sums=('3ab11cead59dab3a869d22f15cdff050')
 
