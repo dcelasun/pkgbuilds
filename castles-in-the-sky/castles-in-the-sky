@@ -5,4 +5,4 @@ if [ ! -d "$HOME"/.castles-in-the-sky ] ; then
    #prepare the environment here
 fi
 
-WINEDEBUG=-all wine /usr/share/castles-in-the-sky/CastlesInTheSky.exe
+WINEPREFIX="$HOME"/.castles-in-the-sky WINEDEBUG=-all wine /usr/share/castles-in-the-sky/CastlesInTheSky.exe

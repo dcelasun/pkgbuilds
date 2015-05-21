@@ -11,5 +11,6 @@
 *.7z
 *.rpm
 *.deb
+*.exe
 # Backup files
 *~
