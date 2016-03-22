@@ -19,7 +19,7 @@ pushd "${TEMP}"
 
 git clone ssh://aur@aur4.archlinux.org/${PKGNAME}.git upstream
 pushd upstream
-rsync -av --progress "${PKGDIR}"/ "${TEMP}"/upstream --exclude=src --exclude=pkg --exclude="*.tar.*" --exclude="*.zip" --exclude="*.7z" --exclude="*.rar" --exclude="*~" --exclude="*.deb" --exclude="*.rpm" --exclude="*.tar" --exclude="*~"
+rsync -av --progress "${PKGDIR}"/ "${TEMP}"/upstream --exclude=src --exclude=pkg --exclude="*.tar.*" --exclude="*.zip" --exclude="*.7z" --exclude="*.rar" --exclude="*~" --exclude="*.deb" --exclude="*.rpm" --exclude="*.tar" --exclude="*~" --exclude="*.tgz"
 mksrcinfo
 git add .
 git commit -m "Update ${PKGNAME}"
