@@ -12,5 +12,6 @@
 *.rpm
 *.deb
 *.exe
+*.tgz
 # Backup files
 *~
