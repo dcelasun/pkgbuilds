@@ -1,0 +1,17 @@
+# makepkg directory
+*/pkg/*
+*/src/*
+
+# Binary and source packages
+*.tar.xz
+*.tar.gz
+*.tar.bz2
+*.zip
+*.tar
+*.7z
+*.rpm
+*.deb
+*.exe
+*.tgz
+# Backup files
+*~
