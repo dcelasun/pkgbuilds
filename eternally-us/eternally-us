@@ -1,2 +1,0 @@
-#!/bin/bash
-WINEDEBUG=-all WINEARCH=win32 WINEPREFIX="$HOME"/.eternally-us wine /usr/share/eternally-us/EternallyUs.exe
