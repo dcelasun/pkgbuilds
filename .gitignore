@@ -16,3 +16,6 @@
 *.run
 # Backup files
 *~
+# Signatures
+*.sig
+*.asc
