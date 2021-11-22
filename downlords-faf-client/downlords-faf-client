@@ -1,5 +1,5 @@
 #!/bin/sh
-export INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-15-jdk
-pushd /usr/share/java/downlords-faf-client
-exec ./downlords-faf-client "$@"
-popd
+export INSTALL4J_JAVA_HOME=/usr/lib/jvm/default
+pushd /usr/share/java/downlords-faf-client > /dev/null
+exec ./faf-client "$@"
+popd > /dev/null

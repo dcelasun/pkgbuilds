@@ -1,0 +1,10 @@
+@@ -145,9 +145,6 @@
+   if [ "$ver_major" = "" ]; then
+     return;
+   fi
+-  if [ "$ver_major" -gt "15" ]; then
+-    return;
+-  fi
+ 
+   app_java_home=$test_dir
+ }
