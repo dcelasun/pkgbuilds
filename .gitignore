@@ -1,3 +1,6 @@
+# cleanup script
+cleanup.sh
+
 # makepkg directory
 */pkg/*
 */src/*
