@@ -7,6 +7,7 @@ Icon=visual-studio-code-insiders
 Type=Application
 NoDisplay=true
 StartupNotify=true
+StartupWMClass=code-insiders-url-handler
 Categories=Utility;TextEditor;Development;IDE;
 MimeType=x-scheme-handler/vscode-insiders;
 Keywords=vscode;
