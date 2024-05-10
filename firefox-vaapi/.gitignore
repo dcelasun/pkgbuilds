@@ -1,0 +1,6 @@
+src/
+pkg/
+*.pkg.*
+*.tar.*
+*.asc
+*.log
