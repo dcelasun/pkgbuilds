@@ -5,7 +5,7 @@
 pkgbase=intellij-idea-ultimate-edition
 pkgname=(intellij-idea-ultimate-edition intellij-idea-ultimate-edition-jre)
 pkgver=2024.2
-pkgrel=1
+pkgrel=2
 _buildver=242.20224.300
 jbr_ver=21.0.2
 jbr_build=aarch64-b346
@@ -57,7 +57,7 @@ package_intellij-idea-ultimate-edition() {
   # https://youtrack.jetbrains.com/issue/IDEA-185828
   chmod +x "$pkgdir"/opt/$pkgbase/plugins/maven/lib/maven3/bin/mvn
 
-  ln -s /opt/$pkgname/bin/idea.sh "$pkgdir"/usr/bin/$pkgname
+  ln -s /opt/$pkgname/bin/idea "$pkgdir"/usr/bin/$pkgname
   install -D -m644 "$srcdir"/jetbrains-idea.desktop "$pkgdir"/usr/share/applications/jetbrains-idea.desktop
   install -D -m644 "$pkgdir"/opt/$pkgbase/bin/idea.svg "$pkgdir"/usr/share/pixmaps/"$pkgname".svg
 
