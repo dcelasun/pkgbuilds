@@ -2,10 +2,10 @@
 
 pkgname=visual-studio-code-insiders-bin
 _pkgname=visual-studio-code-insiders
-pkgver=1722002452
+pkgver=1732658437
 pkgrel=1
 pkgdesc="Editor for building and debugging modern web and cloud applications (insiders version)"
-arch=('x86_64' 'i686' 'aarch64' 'armv7h')
+arch=('x86_64' 'aarch64' 'armv7h')
 url="https://code.visualstudio.com/"
 license=('custom: commercial')
 # lsof: need for terminal splitting, see https://github.com/Microsoft/vscode/issues/62991
@@ -21,21 +21,17 @@ pkgver() {
         IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-arm64/insider); echo "${ADDR[7]}" | sed 's/code-insider-arm64-//g' | sed 's/.tar.gz//g' | sed 's/-/./g'
     elif [ "${CARCH}" = "armv7h" ]; then
         IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-armhf/insider); echo "${ADDR[7]}" | sed 's/code-insider-armhf-//g' | sed 's/.tar.gz//g' | sed 's/-/./g'
-    else
-        IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-ia32/insider); echo "${ADDR[7]}" | sed 's/code-insider-//g' | sed 's/.tar.gz//g' | sed 's/-/./g'
     fi
 }
 source=(${_pkgname}.desktop ${_pkgname}-url-handler.desktop ${_pkgname}-bin.sh)
 source_x86_64=(code_x64_${pkgver}.tar.gz::https://update.code.visualstudio.com/latest/linux-x64/insider)
 source_aarch64=(code_arm64_${pkgver}.tar.gz::https://update.code.visualstudio.com/latest/linux-arm64/insider)
 source_armv7h=(code_armhf_${pkgver}.tar.gz::https://update.code.visualstudio.com/latest/linux-armhf/insider)
-source_i686=(code_ia32_${pkgver}.tar.gz::https://update.code.visualstudio.com/latest/linux-ia32/insider)
 
 sha256sums=('381bcf5644e7fba645537215f5d488b25fc9ee1509d19226f031071a6abb3bdd'
             'b961802b4f27ae8f871f64a1435dd93ee17fc72f78137bf6cc3f6aa1b107105d'
             '44c99cf30f0ae3ea32c6176b86265cf6c8044de4497b6b45b0c912b5ad5b004c')
 sha256sums_x86_64=('SKIP')
-sha256sums_i686=('SKIP')
 sha256sums_aarch64=('SKIP')
 sha256sums_armv7h=('SKIP')
 package() {
