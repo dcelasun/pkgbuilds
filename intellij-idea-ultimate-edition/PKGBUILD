@@ -4,8 +4,8 @@
 
 pkgname=intellij-idea-ultimate-edition
 pkgver=2024.3.2.2
-pkgrel=2
-_buildver=243.23654.153
+pkgrel=3
+_buildver=243.23654.189
 jbr_ver=21.0.5
 jbr_build=aarch64-b762
 jbr_minor=40
