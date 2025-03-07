@@ -6,6 +6,7 @@ cleanup.sh
 */src/*
 
 # Binary and source packages
+*.zst
 *.tar.xz
 *.tar.gz
 *.tar.bz2
