@@ -1,6 +1,6 @@
 pkgbase = intellij-idea-ultimate-edition
 	pkgdesc = An intelligent IDE for Java, Groovy and other programming languages with advanced refactoring features intensely focused on developer productivity.
-	pkgver = 2024.3.4.1
+	pkgver = 2024.3.5
 	pkgrel = 1
 	url = https://www.jetbrains.com/idea/
 	arch = x86_64
@@ -11,13 +11,13 @@ pkgbase = intellij-idea-ultimate-edition
 	options = !strip
 	source = jetbrains-idea.desktop
 	sha256sums = 83af2ba8f9f14275a6684e79d6d4bd9b48cd852c047dacfc81324588fa2ff92b
-	source_x86_64 = https://download.jetbrains.com/idea/ideaIU-2024.3.4.1.tar.gz
-	sha256sums_x86_64 = e9b5b868e425aa1255d75f85028e7ba6275bb8aab88781e960c2c7c34f2173e8
-	source_aarch64 = https://download.jetbrains.com/idea/ideaIU-2024.3.4.1-aarch64.tar.gz
-	source_aarch64 = https://cache-redirector.jetbrains.com/intellij-jbr/jbr-21.0.6-linux-aarch64-b895.91.tar.gz
+	source_x86_64 = https://download.jetbrains.com/idea/ideaIU-2024.3.5.tar.gz
+	sha256sums_x86_64 = f8e8e864f4fedddf1d366a7db23fc4132192c3a6029c614a382186ff564a78a1
+	source_aarch64 = https://download.jetbrains.com/idea/ideaIU-2024.3.5-aarch64.tar.gz
+	source_aarch64 = https://cache-redirector.jetbrains.com/intellij-jbr/jbr-21.0.6-linux-aarch64-b895.97.tar.gz
 	source_aarch64 = https://github.com/JetBrains/intellij-community/raw/master/bin/linux/aarch64/fsnotifier
-	sha256sums_aarch64 = a6245e6e1bef3062be5b06cf61bd2eb489e64c6c26f86040cb9c28e4c65e780b
-	sha256sums_aarch64 = b80415459b5cd8be6075916f606ac5c4b2545f94d0194883cb0a371df8ddefe9
+	sha256sums_aarch64 = 0f072350137540672fd4de19768175164a2497290098321dfefaaaff0097f524
+	sha256sums_aarch64 = 1ebdc9539b94280d2ea2b342c38818723529438ff7d656ed8680aec16e62f778
 	sha256sums_aarch64 = eb3c61973d34f051dcd3a9ae628a6ee37cd2b24a1394673bb28421a6f39dae29
 
 pkgname = intellij-idea-ultimate-edition
