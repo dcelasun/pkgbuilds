@@ -3,9 +3,9 @@
 
 
 pkgname=intellij-idea-ultimate-edition
-pkgver=2025.1.1
+pkgver=2025.1.1.1
 pkgrel=1
-_buildver=251.25410.109
+_buildver=251.25410.129
 jbr_ver=21.0.6
 jbr_build=aarch64-b895
 jbr_minor=109
@@ -22,8 +22,8 @@ source_aarch64=("https://download.jetbrains.com/idea/ideaIU-$pkgver-aarch64.tar.
                 "https://cache-redirector.jetbrains.com/intellij-jbr/jbr-$jbr_ver-linux-$jbr_build.$jbr_minor.tar.gz"
                  "https://github.com/JetBrains/intellij-community/raw/master/bin/linux/aarch64/fsnotifier")
 sha256sums=('83af2ba8f9f14275a6684e79d6d4bd9b48cd852c047dacfc81324588fa2ff92b')
-sha256sums_x86_64=('17d959a3adc60ed25ff7740b0acfcbbbe40b58cba13dcd97a6a6217ef7227a75')
-sha256sums_aarch64=('6ab3181c0ae28f69afeae1f0d9c010065b0d6344d46fc4ebd1fdfd11b6305d7f'
+sha256sums_x86_64=('337d34b20cdaa8da30d71b98e1b36817bdfe2f2245c491ef38f0cee02f0d0316')
+sha256sums_aarch64=('756baa32d72bd982d9b8c06f86cd42755d2677a9f1ea37bd6ad6a963d17226b2'
                     '04fbf6d6a0e15f8bc0ae8ff9fdcf80995eb2ce6be1ef6f543618ba66d86498e5'
                     'eb3c61973d34f051dcd3a9ae628a6ee37cd2b24a1394673bb28421a6f39dae29')
 
