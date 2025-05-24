@@ -1,0 +1,82 @@
+on:
+  workflow_call:
+    inputs:
+      pkgname:
+        type: string
+        description: Package name
+        required: true
+      check-script:
+        type: string
+        description: |
+          Script to check for a new version of the package.
+          Supported outputs are new_pkgver and new_pkgrel.
+        required: true
+
+jobs:
+  update-insiders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
+          fetch-depth: '0'
+      - name: Configure SSH and git
+        run: |
+          mkdir ~/.ssh
+          echo "${{ secrets.SSH_KEY_PRIVATE }}" > ~/.ssh/github_aur
+          echo "${{ secrets.SSH_KEY_PUBLIC }}" > ~/.ssh/github_aur.pub
+          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+          cat >> ~/.ssh/config<< EOF
+          Host aur.archlinux.org
+              User aur
+              IdentityFile ~/.ssh/github_aur
+          EOF
+
+          chmod 700 ~/.ssh
+          chmod -R 600 ~/.ssh/*
+
+          eval $(ssh-agent -s)
+          ssh-add ~/.ssh/github_aur
+
+          ls -alh ~/.ssh
+          cat ~/.ssh/known_hosts
+          cat ~/.ssh/config
+
+          git config --global gpg.format ssh
+          git config --global user.signingkey ~/.ssh/github_aur.pub
+          git config --global commit.gpgsign true
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+          git config --global user.name "${{ secrets.GIT_USER }}"
+      - name: Check new version
+        id: check
+        run: ${{ inputs.check-script }}
+      - name: "Update checksums & .SRCINFO"
+        if: steps.check.outputs.new_pkgver != '' || steps.ucheckpdate.outputs.new_pkgrel != ''
+        id: makepkg
+        uses: dcelasun/archlinux-package-action@37a7b00ba9b402edce0bf04aa82229800eec516c # 24-May-2025
+        with:
+          path: ${{ inputs.pkgname }}
+          updpkgsums: true
+          srcinfo: true
+          namcap: false
+          pkgver: '${{ steps.update.outputs.new_pkgver }}'
+          pkgrel: '${{ steps.update.outputs.new_pkgrel }}'
+      - name: Commit changes
+        if: steps.makepkg.outcome == 'success'
+        id: commit
+        run: |
+          pkgname="${{ inputs.pkgname }}"
+          msg="Update to ${{ steps.update.outputs.new_pkgver }}"
+          if [ -z "${{ steps.update.outputs.new_pkgver }}" ]; then
+            msg="Bump pkgrel to ${{ steps.update.outputs.new_pkgrel }}"
+          fi
+          msg="$(printf "[$pkgname] ${msg}\n\n[skip ci]")"
+
+          git commit -am "$msg"
+          git push
+      - name: Push to AUR
+        if: steps.commit.outcome == 'success'
+        run: |
+          ./aurpublish ${{ inputs.pkgname }}
