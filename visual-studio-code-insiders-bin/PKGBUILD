@@ -1,7 +1,7 @@
 # Maintainer: D. Can Celasun <can[at]dcc[dot]im>
 pkgname=visual-studio-code-insiders-bin
 _pkgname=visual-studio-code-insiders
-pkgver=1741116515
+pkgver=1747983148
 pkgrel=1
 pkgdesc="Editor for building and debugging modern web and cloud applications (insiders version)"
 arch=('x86_64' 'aarch64' 'armv7h')
@@ -22,9 +22,9 @@ source_armv7h=(code_armhf_${pkgver}.tar.gz::https://update.code.visualstudio.com
 sha256sums=('381bcf5644e7fba645537215f5d488b25fc9ee1509d19226f031071a6abb3bdd'
             'b961802b4f27ae8f871f64a1435dd93ee17fc72f78137bf6cc3f6aa1b107105d'
             '44c99cf30f0ae3ea32c6176b86265cf6c8044de4497b6b45b0c912b5ad5b004c')
-sha256sums_x86_64=('SKIP')
-sha256sums_aarch64=('SKIP')
-sha256sums_armv7h=('SKIP')
+sha256sums_x86_64=('da02027f5df11d59bd70735540e4ff82ad696ff89621b2e800c0db0edd8c6217')
+sha256sums_aarch64=('6a023f8d7d387a66a0493255860faa6e8225ab91cb2605b8634066497610abd5')
+sha256sums_armv7h=('e7a526c0be8d229cc3a92d56f41dd9a6c9a8b161d2ca69f1c4644e81a08e14ec')
 
 package() {
   _pkg=VSCode-linux-x64
