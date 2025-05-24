@@ -6,14 +6,17 @@ on:
   workflow_dispatch:
     inputs:
       force-update:
-        type: boolean
-        description: "Force a pkgrel bump if pkgver doesn't change"
-        default: false
+        type: choice
+        description: "Bump pkgrel if pkgver unchanged"
+        default: 'no'
+        options:
+          - 'yes'
+          - 'no'
   schedule:
     - cron: "0 1 * * *" # 01:00 every day
 
 env:
-  FORCE_UPDATE: ${{ inputs.force-update > '' && inputs.force-update || true }}
+  FORCE_UPDATE: ${{ inputs.force-update != '' && inputs.force-update || 'yes' }}
 
 jobs:
   update-insiders:
@@ -82,19 +85,18 @@ jobs:
           fi
 
           if [ "${version_current}" == "${version_new}" ]; then
-          echo "::notice ::No new version found, still at $version_current"
-          if [ "${{ env.FORCE_UPDATE }}" == "true" ]; then
-            pkgrel=$((pkgrel_current + 1))
-            echo "::notice ::Force update requested, bumping pkgrel to $pkgrel"
-            echo "new_pkgrel=$pkgrel" >> $GITHUB_OUTPUT
-          fi
-
-          exit 0
+            echo "::notice ::No new version found, still at $version_current"
+            if [ "${{ env.FORCE_UPDATE }}" == 'yes' ]; then
+              pkgrel=$((pkgrel_current + 1))
+              echo "::notice ::Force update requested, bumping pkgrel to $pkgrel"
+              echo "new_pkgrel=$pkgrel" >> $GITHUB_OUTPUT
+            fi
+            exit 0
           fi
 
           echo "::notice ::Version changed $version_current -> $version_new"
-          awk -i inplace -v ver="$version_new" '{gsub("^pkgver=([0-9]+)$", "pkgver="ver)}1' visual-studio-code-insiders-bin/PKGBUILD
           echo "new_version=$version_new" >> $GITHUB_OUTPUT
+          echo "new_pkgrel=1" >> $GITHUB_OUTPUT
       - name: "Update checksums & .SRCINFO"
         if: steps.update.outputs.new_version != '' || steps.update.outputs.new_pkgrel != ''
         id: makepkg
@@ -117,10 +119,8 @@ jobs:
           msg="$(printf "[visual-studio-code-insiders-bin] ${msg}\n\n[skip ci]")"
 
           git commit -am "$msg"
-          git log --oneline | head -5
           git push
       - name: Push to AUR
         if: steps.commit.outcome == 'success'
         run: |
-          ssh -T aur@aur.archlinux.org help
           ./aurpublish visual-studio-code-insiders-bin
