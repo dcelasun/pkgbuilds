@@ -52,6 +52,14 @@ jobs:
             echo "::error ::new-pkgver and new-pkgrel both empty"
             exit 1
           fi
+
+          if [ ! -z "${{ inputs.new-pkgver }}" ]; then
+            valid=$(printf "${{ inputs.new-pkgver }}" | awk 'match($0, "^([a-zA-Z0-9_.]+)$", arr) {print arr[1]}')
+            if [ -z "$valid" ]]; then
+              echo "::error ::pkgver can only contain letters, numbers, dots and underscores"
+              exit 1
+            fi
+          fi
       - name: Configure SSH and git
         run: |
           mkdir ~/.ssh
