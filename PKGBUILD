@@ -1,5 +1,4 @@
 # Maintainer: D. Can Celasun <can[at]dcc[dot]im>
-
 pkgname=visual-studio-code-insiders-bin
 _pkgname=visual-studio-code-insiders
 pkgver=1741116515
@@ -15,15 +14,6 @@ optdepends=('glib2: Needed for move to trash functionality'
 provides=(vscode)
 options=(!strip)
 
-pkgver() {
-    if [ "${CARCH}" = "x86_64" ]; then
-        IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-x64/insider); echo "${ADDR[7]}" | sed 's/code-insider-x64-//g' | sed 's/.tar.gz//g' | sed 's/-/./g'
-    elif [ "${CARCH}" = "aarch64" ]; then
-        IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-arm64/insider); echo "${ADDR[7]}" | sed 's/code-insider-arm64-//g' | sed 's/.tar.gz//g' | sed 's/-/./g'
-    elif [ "${CARCH}" = "armv7h" ]; then
-        IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-armhf/insider); echo "${ADDR[7]}" | sed 's/code-insider-armhf-//g' | sed 's/.tar.gz//g' | sed 's/-/./g'
-    fi
-}
 source=(${_pkgname}.desktop ${_pkgname}-url-handler.desktop ${_pkgname}-bin.sh)
 source_x86_64=(code_x64_${pkgver}.tar.gz::https://update.code.visualstudio.com/latest/linux-x64/insider)
 source_aarch64=(code_arm64_${pkgver}.tar.gz::https://update.code.visualstudio.com/latest/linux-arm64/insider)
@@ -35,6 +25,7 @@ sha256sums=('381bcf5644e7fba645537215f5d488b25fc9ee1509d19226f031071a6abb3bdd'
 sha256sums_x86_64=('SKIP')
 sha256sums_aarch64=('SKIP')
 sha256sums_armv7h=('SKIP')
+
 package() {
   _pkg=VSCode-linux-x64
   if [ "${CARCH}" = "aarch64" ]; then
