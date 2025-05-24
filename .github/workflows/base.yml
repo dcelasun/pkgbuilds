@@ -25,7 +25,7 @@ on:
         type: string
         description: |
           Skip makepkg, commit after updating PKGBUILD.
-          Useful for large packages that can't be build on Github, like firefox-vaapi.
+          Useful for large packages that can't be built on Github, like firefox-vaapi.
         default: 'no'
 
 jobs:
