@@ -15,51 +15,70 @@ on:
   schedule:
     - cron: "0 1 * * *" # 01:00 every day
 
-env:
-  FORCE_UPDATE: ${{ inputs.force-update != '' && inputs.force-update || 'yes' }}
-
 jobs:
+  setup:
+    # See link for why this is needed
+    # https://github.com/orgs/community/discussions/26671#discussioncomment-3252793
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      new_pkgver: ${{ steps.pkg.outputs.new_pkgver }}
+      new_pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
+      - name: Calculate pkgver and pkgrel
+        id: pkg
+        run: |
+          version_current=$(awk 'match($0, "^pkgver=([0-9]+)$", arr) {print arr[1]}' visual-studio-code-insiders-bin/PKGBUILD)
+          pkgrel_current=$(awk 'match($0, "^pkgrel=([0-9]+)$", arr) {print arr[1]}' visual-studio-code-insiders-bin/PKGBUILD)
+
+          if [ -z "${version_current}" ]; then
+          echo "::error ::Could not find current version"
+          exit 1
+          fi
+
+          version_x86=$(IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-x64/insider); echo "${ADDR[7]}" | sed 's/code-insider-x64-//g' | sed 's/.tar.gz//g' | sed 's/-/./g')
+          version_a64=$(IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-arm64/insider); echo "${ADDR[7]}" | sed 's/code-insider-arm64-//g' | sed 's/.tar.gz//g' | sed 's/-/./g')
+          version_a7h=$(IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-armhf/insider); echo "${ADDR[7]}" | sed 's/code-insider-armhf-//g' | sed 's/.tar.gz//g' | sed 's/-/./g')
+
+          version_new=""
+          if [ -n "${version_x86}" ]; then
+          version_new=$version_x86
+          elif [ -n "${version_a64}" ]; then
+          version_new=$version_a64
+          elif [ -n "${version_a7h}" ]; then
+          version_new=$version_a7h
+          fi
+
+          if [ -z "${version_new}" ]; then
+          echo "::error ::Could not find new version for any arch"
+          exit 1
+          fi
+
+          if [ "${version_current}" == "${version_new}" ]; then
+            echo "::notice ::No new version found, still at $version_current"
+            if [ "${{ github.event.inputs.force-update || 'no' }}" == 'yes' ]; then
+              pkgrel=$((pkgrel_current + 1))
+              echo "::notice ::Force update requested, bumping pkgrel to $pkgrel"
+              echo "new_pkgrel=$pkgrel" >> $GITHUB_OUTPUT
+            fi
+            exit 0
+          fi
+
+          echo "::notice ::Version changed $version_current -> $version_new"
+          echo "new_pkgver=$version_new" >> $GITHUB_OUTPUT
+          echo "new_pkgrel=1" >> $GITHUB_OUTPUT
   update-insiders:
+    name: Update package
     uses: ./.github/workflows/update-package.yml
+    needs: setup
+    secrets: inherit
     with:
       pkgname: visual-studio-code-insiders-bin
-      check-script: |
-        version_current=$(awk 'match($0, "^pkgver=([0-9]+)$", arr) {print arr[1]}' visual-studio-code-insiders-bin/PKGBUILD)
-        pkgrel_current=$(awk 'match($0, "^pkgrel=([0-9]+)$", arr) {print arr[1]}' visual-studio-code-insiders-bin/PKGBUILD)
-
-        if [ -z "${version_current}" ]; then
-        echo "::error ::Could not find current version"
-        exit 1
-        fi
-
-        version_x86=$(IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-x64/insider); echo "${ADDR[7]}" | sed 's/code-insider-x64-//g' | sed 's/.tar.gz//g' | sed 's/-/./g')
-        version_a64=$(IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-arm64/insider); echo "${ADDR[7]}" | sed 's/code-insider-arm64-//g' | sed 's/.tar.gz//g' | sed 's/-/./g')
-        version_a7h=$(IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-armhf/insider); echo "${ADDR[7]}" | sed 's/code-insider-armhf-//g' | sed 's/.tar.gz//g' | sed 's/-/./g')
-
-        version_new=""
-        if [ -n "${version_x86}" ]; then
-        version_new=$version_x86
-        elif [ -n "${version_a64}" ]; then
-        version_new=$version_a64
-        elif [ -n "${version_a7h}" ]; then
-        version_new=$version_a7h
-        fi
-
-        if [ -z "${version_new}" ]; then
-        echo "::error ::Could not find new version for any arch"
-        exit 1
-        fi
-
-        if [ "${version_current}" == "${version_new}" ]; then
-          echo "::notice ::No new version found, still at $version_current"
-          if [ "${{ env.FORCE_UPDATE }}" == 'yes' ]; then
-            pkgrel=$((pkgrel_current + 1))
-            echo "::notice ::Force update requested, bumping pkgrel to $pkgrel"
-            echo "new_pkgrel=$pkgrel" >> $GITHUB_OUTPUT
-          fi
-          exit 0
-        fi
-
-        echo "::notice ::Version changed $version_current -> $version_new"
-        echo "new_version=$version_new" >> $GITHUB_OUTPUT
-        echo "new_pkgrel=1" >> $GITHUB_OUTPUT
+      new-pkgver: ${{ needs.setup.outputs.new_pkgver }}
+      new-pkgrel: ${{ needs.setup.outputs.new_pkgrel }}
+      publish-to-aur: 'yes'

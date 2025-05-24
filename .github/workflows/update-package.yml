@@ -5,23 +5,32 @@ on:
         type: string
         description: Package name
         required: true
-      check-script:
+      new-pkgver:
         type: string
-        description: |
-          Script to check for a new version of the package.
-          Supported outputs are new_pkgver and new_pkgrel.
-        required: true
+        required: false
+      new-pkgrel:
+        type: string
+        required: false
+      publish-to-aur:
+        type: string
+        required: false
+        default: 'no'
 
 jobs:
-  update-insiders:
+  do:
     runs-on: ubuntu-latest
     steps:
+      - name: Validate inputs
+        run: |
+          if [ -z "${{ inputs.new-pkgver }}" ] && [ -z "${{ inputs.new-pkgrel }}" ]; then
+            echo "::error ::new-pkgver and new-pkgrel both empty"
+            exit 1
+          fi
       - name: Clone repository
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
           ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
-          fetch-depth: '0'
       - name: Configure SSH and git
         run: |
           mkdir ~/.ssh
@@ -49,11 +58,8 @@ jobs:
           git config --global commit.gpgsign true
           git config --global user.email "${{ secrets.GIT_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_USER }}"
-      - name: Check new version
-        id: check
-        run: ${{ inputs.check-script }}
       - name: "Update checksums & .SRCINFO"
-        if: steps.check.outputs.new_pkgver != '' || steps.ucheckpdate.outputs.new_pkgrel != ''
+        if: inputs.new-pkgver != '' || inputs.new-pkgrel != ''
         id: makepkg
         uses: dcelasun/archlinux-package-action@37a7b00ba9b402edce0bf04aa82229800eec516c # 24-May-2025
         with:
@@ -61,22 +67,39 @@ jobs:
           updpkgsums: true
           srcinfo: true
           namcap: false
-          pkgver: '${{ steps.update.outputs.new_pkgver }}'
-          pkgrel: '${{ steps.update.outputs.new_pkgrel }}'
+          pkgver: '${{ inputs.new-pkgver }}'
+          pkgrel: '${{ inputs.new-pkgrel }}'
       - name: Commit changes
         if: steps.makepkg.outcome == 'success'
         id: commit
         run: |
           pkgname="${{ inputs.pkgname }}"
-          msg="Update to ${{ steps.update.outputs.new_pkgver }}"
-          if [ -z "${{ steps.update.outputs.new_pkgver }}" ]; then
-            msg="Bump pkgrel to ${{ steps.update.outputs.new_pkgrel }}"
+          msg="Update to ${{ inputs.new-pkgver }}"
+          if [ -z "${{ inputs.new-pkgver }}" ]; then
+            msg="Bump pkgrel to ${{ inputs.new-pkgrel }}"
           fi
           msg="$(printf "[$pkgname] ${msg}\n\n[skip ci]")"
+
+          # This ugliness is necessary to escape square brackets within the message
+          # See comments of https://stackoverflow.com/a/74232400/879047
+          echo "commit_msg<<EOF"$'\n'"$msg"$'\n'EOF >> $GITHUB_OUTPUT
 
           git commit -am "$msg"
           git push
       - name: Push to AUR
-        if: steps.commit.outcome == 'success'
-        run: |
-          ./aurpublish ${{ inputs.pkgname }}
+        if: steps.commit.outcome == 'success' && inputs.publish-to-aur == 'yes'
+        uses: KSXGitHub/github-actions-deploy-aur@2ac5a4c1d7035885d46b10e3193393be8460b6f1 # v4.1.1
+        with:
+          pkgname: ${{ inputs.pkgname }}
+          pkgbuild: ./${{ inputs.pkgname }}/PKGBUILD
+          assets: |
+            ./${{ inputs.pkgname }}/*
+          post_process: |
+            git config --global gpg.format ssh
+            git config --global user.signingkey ~/.ssh/aur
+            git config --global commit.gpgsign true
+          commit_username: ${{ secrets.GIT_USER }}
+          commit_email: ${{ secrets.GIT_EMAIL }}
+          ssh_private_key: ${{ secrets.SSH_KEY_PRIVATE }}
+          commit_message: ${{ steps.commit.outputs.commit_msg }}
+          ssh_keyscan_types: ed25519
