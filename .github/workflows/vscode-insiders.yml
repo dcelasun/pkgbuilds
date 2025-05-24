@@ -1,0 +1,126 @@
+name: Update visual-studio-code-insiders-bin
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      force-update:
+        type: boolean
+        description: "Force a pkgrel bump if pkgver doesn't change"
+        default: false
+  schedule:
+    - cron: "0 1 * * *" # 01:00 every day
+
+env:
+  FORCE_UPDATE: ${{ inputs.force-update > '' && inputs.force-update || true }}
+
+jobs:
+  update-insiders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
+          fetch-depth: '0'
+      - name: Configure SSH and git
+        run: |
+          mkdir ~/.ssh
+          echo "${{ secrets.SSH_KEY_PRIVATE }}" > ~/.ssh/github_aur
+          echo "${{ secrets.SSH_KEY_PUBLIC }}" > ~/.ssh/github_aur.pub
+          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+          cat >> ~/.ssh/config<< EOF
+          Host aur.archlinux.org
+              User aur
+              IdentityFile ~/.ssh/github_aur
+          EOF
+
+          chmod 700 ~/.ssh
+          chmod -R 600 ~/.ssh/*
+
+          eval $(ssh-agent -s)
+          ssh-add ~/.ssh/github_aur
+
+          ls -alh ~/.ssh
+          cat ~/.ssh/known_hosts
+          cat ~/.ssh/config
+
+          git config --global gpg.format ssh
+          git config --global user.signingkey ~/.ssh/github_aur.pub
+          git config --global commit.gpgsign true
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+          git config --global user.name "${{ secrets.GIT_USER }}"
+      - name: Check and update version
+        id: update
+        run: |
+          version_current=$(awk 'match($0, "^pkgver=([0-9]+)$", arr) {print arr[1]}' visual-studio-code-insiders-bin/PKGBUILD)
+          pkgrel_current=$(awk 'match($0, "^pkgrel=([0-9]+)$", arr) {print arr[1]}' visual-studio-code-insiders-bin/PKGBUILD)
+
+          if [ -z "${version_current}" ]; then
+          echo "::error ::Could not find current version"
+          exit 1
+          fi
+
+          version_x86=$(IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-x64/insider); echo "${ADDR[7]}" | sed 's/code-insider-x64-//g' | sed 's/.tar.gz//g' | sed 's/-/./g')
+          version_a64=$(IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-arm64/insider); echo "${ADDR[7]}" | sed 's/code-insider-arm64-//g' | sed 's/.tar.gz//g' | sed 's/-/./g')
+          version_a7h=$(IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-armhf/insider); echo "${ADDR[7]}" | sed 's/code-insider-armhf-//g' | sed 's/.tar.gz//g' | sed 's/-/./g')
+
+          version_new=""
+          if [ -n "${version_x86}" ]; then
+          version_new=$version_x86
+          elif [ -n "${version_a64}" ]; then
+          version_new=$version_a64
+          elif [ -n "${version_a7h}" ]; then
+          version_new=$version_a7h
+          fi
+
+          if [ -z "${version_new}" ]; then
+          echo "::error ::Could not find new version for any arch"
+          exit 1
+          fi
+
+          if [ "${version_current}" == "${version_new}" ]; then
+          echo "::notice ::No new version found, still at $version_current"
+          if [ "${{ env.FORCE_UPDATE }}" == "true" ]; then
+            pkgrel=$((pkgrel_current + 1))
+            echo "::notice ::Force update requested, bumping pkgrel to $pkgrel"
+            echo "new_pkgrel=$pkgrel" >> $GITHUB_OUTPUT
+          fi
+
+          exit 0
+          fi
+
+          echo "::notice ::Version changed $version_current -> $version_new"
+          awk -i inplace -v ver="$version_new" '{gsub("^pkgver=([0-9]+)$", "pkgver="ver)}1' visual-studio-code-insiders-bin/PKGBUILD
+          echo "new_version=$version_new" >> $GITHUB_OUTPUT
+      - name: "Update checksums & .SRCINFO"
+        if: steps.update.outputs.new_version != '' || steps.update.outputs.new_pkgrel != ''
+        id: makepkg
+        uses: dcelasun/archlinux-package-action@37a7b00ba9b402edce0bf04aa82229800eec516c # 24-May-2025
+        with:
+          path: visual-studio-code-insiders-bin
+          updpkgsums: true
+          srcinfo: true
+          namcap: false
+          pkgver: '${{ steps.update.outputs.new_version }}'
+          pkgrel: '${{ steps.update.outputs.new_pkgrel }}'
+      - name: Commit changes
+        if: steps.makepkg.outcome == 'success'
+        id: commit
+        run: |
+          msg="Update to ${{ steps.update.outputs.new_version }}"
+          if [ -z "${{ steps.update.outputs.new_version }}" ]; then
+            msg="Bump pkgrel to ${{ steps.update.outputs.new_pkgrel }}"
+          fi
+          msg="$(printf "[visual-studio-code-insiders-bin] ${msg}\n\n[skip ci]")"
+
+          git commit -am "$msg"
+          git log --oneline | head -5
+          git push
+      - name: Push to AUR
+        if: steps.commit.outcome == 'success'
+        run: |
+          ssh -T aur@aur.archlinux.org help
+          ./aurpublish visual-studio-code-insiders-bin

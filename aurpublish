@@ -177,4 +177,4 @@ fi
 if (( SPEEDUP )); then
     git subtree split -P "${package}" --rejoin
 fi
-git subtree push -P "${package}" ${REMOTE_URL}/${pkgbase}.git master
+GIT_SSH_COMMAND='ssh -vvv' git subtree push -P "${package}" ${REMOTE_URL}/${pkgbase}.git master
