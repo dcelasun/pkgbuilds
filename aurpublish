@@ -1,11 +1,17 @@
 #!/bin/bash
 
-#### Declare usage
+REMOTE_URL='aur@aur.archlinux.org:'
 
-usage()
-{
+#### Declare common functions
+
+# usage and other awkward blocks of preformatted text
+
+usage() {
 	cat <<- _EOF_
-		Usage: ./aurpublish [OPTIONS] PACKAGE
+		Usage: ${0##*/} [OPTIONS] PACKAGE
+		Usage: ${0##*/} log [<options>] PACKAGE [[--] <path>...]
+		Usage: ${0##*/} setup
+
 		Push a subtree to the AUR
 
 		OPTIONS
@@ -16,19 +22,33 @@ usage()
 		                      and a second copy of all commits in the subtree.
 		                      For more details, see the "--rejoin" option in git
 		                      subtree.
+		    -u, --url       Specify the URL of the server that should be used
+		                      for git operations.
 		    -h, --help      Show this usage message
 
 		COMMANDS
-		    log             Display the git log of a single package. This is only
-		                      useful if changes were pulled from the AUR (because
-		                      \`git log\` isn't very good at reading subtrees).
+		    setup           Install githooks to the repository
+		    log             Wrapper for \`git log\`, substituting a package
+		                      subtree for the revision/branch. This is only
+		                      useful if changes were pulled from the AUR
+		                      (because \`git log\` isn't very good at reading
+		                      subtrees).
 _EOF_
 }
 
-## Function to test if package is already committed in git
-is_package_in_git()
-{
-    git ls-tree -d --name-only HEAD | grep -E "^${1}$" > /dev/null 2>&1
+ssh_config() {
+	cat <<- _EOF_
+		\`\`\`
+		Host aur.archlinux.org
+		    User aur
+		    IdentityFile ~/.ssh/keys/aur
+		\`\`\`
+_EOF_
+}
+
+# check if pkgname is already committed in git, relative to repository root
+is_package_in_git() {
+    git ls-tree -d --name-only HEAD | grep -qxF "${1}"
 }
 
 #### Do the great option check
@@ -44,46 +64,117 @@ while [[ "${1}" != "" ]]; do
             exit
             ;;
         -p|--pull)
-            pull_subtree=1
+            PULL_SUBTREE=1
             shift
-            package="${1%/}"
+            package=$(readlink -m "${1}")
+            package=${package##*/}
             ;;
         -s|--speedup)
-            speedup=1
+            SPEEDUP=1
+            ;;
+        -u|--url)
+            REMOTE_URL=${2%/}
+            URL_SET=1
+            shift
             ;;
         log)
-            shift
-            package="${1%/}"
-            shift
-            git log $(git subtree split -P $package) "$@"
-            exit
+            LOG=1
+            while [[ ${2} && ! -d ${2} ]]; do
+                log_pre_opts+=("${2}")
+                shift
+            done
+            ;;
+        setup)
+            SETUP=1
             ;;
         *)
-            if is_package_in_git ${1%/}; then
-                package="${1%/}"
-            else
-                echo "${0}: unrecognized package '${1}'"
-                echo "Try '${0} --help' for more information."
+            if [[ -n ${package} ]]; then
+                echo "error: multiple packages specified"
                 exit 1
             fi
+            package=$(readlink -m "${1}")
+            package=${package##*/}
+            (( LOG )) && break
+            ;;
     esac
     shift
 done
 
+#### INIT
+
+# Run from the repository root, no matter where the script is installed.
+toplevel=$(git rev-parse --show-toplevel) || exit 1
+if [[ $(git rev-parse --is-inside-git-dir) = true ]]; then
+    echo "error: cannot be run from within GIT_DIR"
+    exit 1
+elif [[ ! ${toplevel} -ef ${PWD} ]]; then
+    cd "${toplevel}"
+fi
+
+# sanity check
+if ! git rev-parse -q --verify HEAD > /dev/null ; then
+    echo "error: cannot be run from a branch without any commits"
+    echo "At least commit a README.md or something..."
+    exit 1
+fi
+if (( ! ( PULL_SUBTREE || SETUP ) )) && ! is_package_in_git "${package}"; then
+    echo "${0##*/}: unrecognized package '${package}'"
+    echo "Try '${0##*/} --help' for more information."
+    exit 1
+fi
+
 #### MAIN
 
-if [[ "${pull_subtree}" = "1" ]]; then
+if (( SETUP )); then
+    echo "Adding commit hooks..."
+    shopt -s nullglob
+    for hook in "@HOOKSDIR@"/*.hook; do
+        hookname=${hook##*/}
+        echo "-> ${hookname}"
+        ln -sf "${hook}" "$(git rev-parse --git-dir)/hooks/${hookname%.hook}"
+    done
+    echo "Add the following snippet to your ~/.ssh/config (assuming ssh key is in ~/.ssh/keys/aur):"
+    ssh_config
+    exit 0
+fi
+
+if (( LOG )); then
+    shift
+    git log "${log_pre_opts[@]}" $(git subtree split -P "${package}") "$@"
+    exit 0
+fi
+
+if (( ! URL_SET )); then
+    # use git configured remoteUrl, if set
+    REMOTE_URL=$(git config --default "${REMOTE_URL}" --get aurpublish.remoteUrl | sed 's:/*$::')
+
+    # warn the user if they have a non-default ssh alias for 'aur'
+    auralias=$(ssh -G aur | awk '$1 == "hostname" { print $2 }')
+    if [[ ${auralias} != 'aur' && ${auralias} != 'aur.archlinux.org' ]]; then
+        echo "Warning: You have a non-default alias for 'aur' in your ssh configuration. (${auralias})"
+        echo "Previous versions of aurpublish used the 'aur' ssh hostname, but you should now use the --url option."
+        echo ""
+        echo "This operation will use the git server at: ${REMOTE_URL}"
+        echo ""
+        read -p "Do you wish to continue? [y/n] " userwarned
+        [[ ${userwarned} = [yY] ]] || exit 1
+    fi
+fi
+
+pkgbase="$(sed -rn 's/pkgbase = (.*)/\1/p' "${package}"/.SRCINFO 2>/dev/null)"
+
+if (( PULL_SUBTREE )); then
     # test if prefix already exists
     if is_package_in_git ${package}; then
         git subtree split -P "${package}" --rejoin
-        git subtree pull -P "${package}" aur:${package}.git master -m "Merge subtree '${package}'"
+        git subtree pull -P "${package}" ${REMOTE_URL}/${pkgbase}.git master -m "Merge subtree '${package}'"
     else
-        git subtree add -P "${package}" aur:${package}.git master
+        git subtree add -P "${package}" ${REMOTE_URL}/${package}.git master
     fi
     exit 0
 fi
 
-if [[ "${speedup}" = "1" ]]; then
+if (( SPEEDUP )); then
     git subtree split -P "${package}" --rejoin
 fi
-git subtree push -P "${package}" aur:${package}.git master
+git subtree push -P "${package}" ${REMOTE_URL}/${pkgbase}.git master
