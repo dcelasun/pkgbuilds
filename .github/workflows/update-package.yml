@@ -15,6 +15,12 @@ on:
         type: string
         required: false
         default: 'no'
+      skip-makepkg:
+        type: string
+        description: |
+          Skip makepkg, commit after updating PKGBUILD.
+          Useful for large packages that can't be build on Github, like firefox-vaapi.
+        default: 'no'
 
 jobs:
   do:
@@ -78,6 +84,7 @@ jobs:
           namcap: false
           pkgver: '${{ inputs.new-pkgver }}'
           pkgrel: '${{ inputs.new-pkgrel }}'
+          flags: ${{ inputs.skip-makepkg == 'no' && '-cfs --noconfirm' || '' }}
       - name: Commit changes
         if: steps.makepkg.outcome == 'success'
         id: commit

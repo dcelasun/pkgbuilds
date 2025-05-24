@@ -15,6 +15,14 @@ on:
         type: string
         required: false
         description: "pkgrel"
+      skip-makepkg:
+        type: choice
+        required: true
+        description: "Skip makepkg?"
+        default: 'no'
+        options:
+          - 'yes'
+          - 'no'
       publish:
         type: choice
         required: true
@@ -34,3 +42,4 @@ jobs:
       new-pkgver: ${{ inputs.pkgver }}
       new-pkgrel: ${{ inputs.pkgrel }}
       publish-to-aur: ${{ inputs.publish }}
+      skip-makepkg: ${{ inputs.skip-makepkg }}
