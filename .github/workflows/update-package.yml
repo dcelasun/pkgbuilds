@@ -20,17 +20,26 @@ jobs:
   do:
     runs-on: ubuntu-latest
     steps:
-      - name: Validate inputs
-        run: |
-          if [ -z "${{ inputs.new-pkgver }}" ] && [ -z "${{ inputs.new-pkgrel }}" ]; then
-            echo "::error ::new-pkgver and new-pkgrel both empty"
-            exit 1
-          fi
       - name: Clone repository
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
           ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
+      - name: Validate inputs
+        run: |
+          if [ -z "${{ inputs.pkgname }}" ]; then
+            echo "::error ::pkgname is empty"
+            exit 1
+          fi
+          if [ ! -d "${{ inputs.pkgname }}" ]; then
+            echo "::error ::package ${{ inputs.pkgname }} does not exist"
+            exit 1
+          fi
+
+          if [ -z "${{ inputs.new-pkgver }}" ] && [ -z "${{ inputs.new-pkgrel }}" ]; then
+            echo "::error ::new-pkgver and new-pkgrel both empty"
+            exit 1
+          fi
       - name: Configure SSH and git
         run: |
           mkdir ~/.ssh

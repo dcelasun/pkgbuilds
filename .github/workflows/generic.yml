@@ -1,0 +1,36 @@
+name: Update any package
+run-name: Update ${{ inputs.pkgname }} to ${{ inputs.pkgver }}${{ inputs.pkgrel != '' && '-' || '' }}${{ inputs.pkgrel }}
+on:
+  workflow_dispatch:
+    inputs:
+      pkgname:
+        type: string
+        required: true
+        description: "Package name"
+      pkgver:
+        type: string
+        required: false
+        description: "pkgver"
+      pkgrel:
+        type: string
+        required: false
+        description: "pkgrel"
+      publish:
+        type: choice
+        required: true
+        description: "Publish to AUR?"
+        default: 'yes'
+        options:
+          - 'yes'
+          - 'no'
+
+jobs:
+  update:
+    name: Update package
+    uses: ./.github/workflows/update-package.yml
+    secrets: inherit
+    with:
+      pkgname: ${{ inputs.pkgname }}
+      new-pkgver: ${{ inputs.pkgver }}
+      new-pkgrel: ${{ inputs.pkgrel }}
+      publish-to-aur: ${{ inputs.publish }}
