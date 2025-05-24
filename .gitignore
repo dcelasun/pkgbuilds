@@ -23,3 +23,6 @@ cleanup.sh
 # Signatures
 *.sig
 *.asc
+
+# IDE
+.idea/
