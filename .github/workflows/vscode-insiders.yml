@@ -13,7 +13,9 @@ on:
           - 'yes'
           - 'no'
   schedule:
-    - cron: "0 1 * * *" # 01:00 every day
+    # Github recommends avoiding full hours
+    # See https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#schedule
+    - cron: "21 1 * * *" # 01:21 every day
 
 jobs:
   setup:
