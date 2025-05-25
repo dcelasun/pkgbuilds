@@ -5,7 +5,6 @@
 pkgname=intellij-idea-ultimate-edition
 pkgver=2025.1.1.1
 pkgrel=1
-_buildver=251.25410.129
 jbr_ver=21.0.6
 jbr_build=aarch64-b895
 jbr_minor=109
@@ -36,11 +35,11 @@ prepare() {
   # https://youtrack.jetbrains.com/articles/IDEA-A-48/JetBrains-IDEs-on-AArch64#linux
   if [ "${CARCH}" == "aarch64" ]; then
     cp -a "$srcdir"/jbr-${jbr_ver}-linux-${jbr_build}.${jbr_minor} "$srcdir"/jbr
-    cp -f fsnotifier "$srcdir"/idea-IU-$_buildver/bin/fsnotifier
-    chmod +x "$srcdir"/idea-IU-$_buildver/bin/fsnotifier
-    rm -rf "$srcdir"/idea-IU-$_buildver/jbr
+    cp -f fsnotifier "$srcdir"/idea-IU-*/bin/fsnotifier
+    chmod +x "$srcdir"/idea-IU-*/bin/fsnotifier
+    rm -rf "$srcdir"/idea-IU-*/jbr
   else
-    mv "$srcdir"/idea-IU-$_buildver/jbr "$srcdir"/jbr
+    mv "$srcdir"/idea-IU-*/jbr "$srcdir"/jbr
   fi
 }
 
@@ -55,7 +54,7 @@ package_intellij-idea-ultimate-edition() {
   cd "$srcdir"
 
   install -d "$pkgdir"/{opt/$pkgname,usr/bin}
-  mv idea-IU-${_buildver}/* "$pkgdir"/opt/$pkgbase
+  mv idea-IU-*/* "$pkgdir"/opt/$pkgbase
   mv "$srcdir"/jbr "$pkgdir"/opt/$pkgbase
 
   # https://youtrack.jetbrains.com/issue/IDEA-185828
