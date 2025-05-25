@@ -104,17 +104,24 @@ jobs:
           pkgname: ${{ matrix.package }}
           new-pkgver: ${{ steps.identify.outputs.pkgver }}
           skip-makepkg: ${{ matrix.package == 'firefox-vaapi' && 'yes' || 'no' }}
+      - name: Configure git and SSH
+        uses: ./.github/actions/configure-git-ssh
+        id: configure
+        with:
+          ssh-priv-key: ${{ secrets.SSH_KEY_PRIVATE }}
+          commit-email: ${{ secrets.GIT_EMAIL }}
+          commit-user: ${{ secrets.GIT_USER }}
       - name: Create PR
         if: github.event_name != 'pull_request'
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: ${{ steps.prep.outputs.commit-msg }}
-          committer: GitHub <noreply@github.com>
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-          signoff: false
+          committer: ${{ secrets.GIT_USER }} <${{ secrets.GIT_EMAIL }}>
+          author: ${{ secrets.GIT_USER }} <${{ secrets.GIT_EMAIL }}>
           branch: aur/${{ matrix.package }}
-          delete-branch: true
           title: "Update ${{ matrix.package }} to ${{ steps.identify.outputs.pkgver }}"
           body: ${{ steps.identify.outputs.url }}
+          delete-branch: true
+          signoff: false
           draft: false

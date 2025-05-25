@@ -32,7 +32,7 @@ jobs:
           new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
           new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
       - name: Push to AUR
-        uses: ./.github/actions/push
+        uses: ./.github/actions/push-to-aur
         with:
           pkgname: ${{ inputs.pkgname }}
           commit-msg: ${{ steps.prep.outputs.commit-msg }}

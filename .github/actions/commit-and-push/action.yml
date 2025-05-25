@@ -1,0 +1,22 @@
+name: Commit and push to Github
+inputs:
+  commit-msg:
+    description: Commit message
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Validate inputs
+      shell: bash
+      run: |
+        if [ -z "${{ inputs.commit-msg }}" ]; then
+          echo "::error ::commit-msg is empty"
+          exit 1
+        fi
+    - name: Commit and push to Github
+      id: commit
+      shell: bash
+      run: |
+        git commit -am "${{ inputs.commit-msg }}"
+        git push

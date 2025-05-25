@@ -88,17 +88,22 @@ jobs:
           new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
           new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
           skip-makepkg: 'no'
-      - name: Commit to Github and push
-        uses: ./.github/actions/commit
+      - name: Configure git and SSH
+        uses: ./.github/actions/configure-git-ssh
         if: steps.update.outcome == 'success'
-        id: commit
+        id: configure
         with:
-          commit-msg: ${{ steps.prep.outputs.commit-msg }}
           ssh-priv-key: ${{ secrets.SSH_KEY_PRIVATE }}
           commit-email: ${{ secrets.GIT_EMAIL }}
           commit-user: ${{ secrets.GIT_USER }}
+      - name: Commit and push to Github
+        uses: ./.github/actions/commit-and-push
+        if: steps.configure.outcome == 'success'
+        id: commit
+        with:
+          commit-msg: ${{ steps.prep.outputs.commit-msg }}
       - name: Push to AUR
-        uses: ./.github/actions/push
+        uses: ./.github/actions/push-to-aur
         if: steps.commit.outcome == 'success'
         with:
           pkgname: ${{ env.PKGNAME }}

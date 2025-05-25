@@ -1,4 +1,4 @@
-name: Commit and push to Github
+name: Configure git and SSH with signing supports
 inputs:
   ssh-priv-key:
     description: SSH private key
@@ -9,9 +9,6 @@ inputs:
   commit-email:
     description: User email
     required: true
-  commit-msg:
-    description: Commit message
-    required: true
 
 runs:
   using: "composite"
@@ -19,8 +16,12 @@ runs:
     - name: Validate inputs
       shell: bash
       run: |
-        if [ -z "${{ inputs.commit-msg }}" ]; then
-          echo "::error ::commit-msg is empty"
+        if [ -z "${{ inputs.commit-email }}" ]; then
+          echo "::error ::commit-email is empty"
+          exit 1
+        fi
+        if [ -z "${{ inputs.commit-user }}" ]; then
+          echo "::error ::commit-user is empty"
           exit 1
         fi
     - name: Configure SSH and git
@@ -52,9 +53,3 @@ runs:
         git config --global commit.gpgsign true
         git config --global user.email "${{ inputs.commit-email }}"
         git config --global user.name "${{ inputs.commit-user }}"
-    - name: Commit and push to Github
-      id: commit
-      shell: bash
-      run: |
-        git commit -am "${{ inputs.commit-msg }}"
-        git push
