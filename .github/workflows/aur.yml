@@ -23,6 +23,13 @@ jobs:
         run: docker pull quay.io/aminvakil/archlinux:latest
       - name: Prepare base image and mount packages
         run: |
+          # Create keyfile to avoid Github rate limits
+          # See https://nvchecker.readthedocs.io/en/latest/usage.html#configuration-table:~:text=toml%20config%20file%20containing%20key
+          cat >> keyfile.toml<< EOF
+          [keys]
+            github = "${{ secrets.GITHUB_TOKEN }}"
+          EOF
+
           container_id=$(mktemp)
           docker run --detach --privileged --cgroup-parent=docker.slice --cgroupns private --tmpfs /tmp --tmpfs /run --tmpfs /run/lock -v "${PWD}":/pkgbuilds quay.io/aminvakil/archlinux:latest > "${container_id}"
           docker exec "$(cat ${container_id})" pacman -Syu --noconfirm
@@ -32,7 +39,8 @@ jobs:
         id: nvcheck
         run: |
           sudo apt-get -y install yq # needed for tomlq
-          docker exec "$(cat ${container_id})" nvchecker --failures -c /pkgbuilds/nvchecker.toml
+          docker exec "$(cat ${container_id})" nvchecker --failures -k /pkgbuilds/keyfile.toml -c /pkgbuilds/nvchecker.toml
+          rm -f keyfile.toml # Only needed for the nvchecker command
           nvcmp_output=$(docker exec "$(cat ${container_id})" nvcmp -c /pkgbuilds/nvchecker.toml -j)
           if [ -z "$nvcmp_output" ] || [ "$nvcmp_output" == '[]' ]; then
             echo "::notice ::No new versions found"
