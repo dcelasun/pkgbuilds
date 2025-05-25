@@ -48,7 +48,7 @@ jobs:
           pkgname: ${{ env.PKGNAME }}
           new-pkgver: ${{ inputs.pkgver }}
           new-pkgrel: ${{ inputs.pkgrel }}
-      - name: Update PKGBULD and generate diff
+      - name: Update PKGBUILD and generate diff
         uses: ./.github/actions/updpkgsums
         id: update
         with:
@@ -60,6 +60,9 @@ jobs:
         uses: ./.github/actions/commit
         with:
           commit-msg: ${{ steps.prep.outputs.commit-msg }}
+          ssh-priv-key: ${{ secrets.SSH_KEY_PRIVATE }}
+          commit-email: ${{ secrets.GIT_EMAIL }}
+          commit-user: ${{ secrets.GIT_USER }}
       - name: Push to AUR
         uses: ./.github/actions/push
         if: inputs.publish == 'yes'
@@ -68,3 +71,6 @@ jobs:
           commit-msg: ${{ steps.prep.outputs.commit-msg }}
           new-pkgver: ${{ inputs.pkgver }}
           new-pkgrel: ${{ inputs.pkgrel }}
+          ssh-priv-key: ${{ secrets.SSH_KEY_PRIVATE }}
+          commit-email: ${{ secrets.GIT_EMAIL }}
+          commit-user: ${{ secrets.GIT_USER }}

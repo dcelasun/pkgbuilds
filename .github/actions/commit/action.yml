@@ -1,5 +1,14 @@
 name: Commit and push to Github
 inputs:
+  ssh-priv-key:
+    description: SSH private key
+    required: true
+  commit-user:
+    description: User name
+    required: true
+  commit-email:
+    description: User email
+    required: true
   commit-msg:
     description: Commit message
     required: true
@@ -18,8 +27,8 @@ runs:
       shell: bash
       run: |
         mkdir ~/.ssh
-        echo "${{ secrets.SSH_KEY_PRIVATE }}" > ~/.ssh/github_aur
-        echo "${{ secrets.SSH_KEY_PUBLIC }}" > ~/.ssh/github_aur.pub
+        echo "${{ inputs.ssh-priv-key }}" > ~/.ssh/github_aur
+        ssh-keygen -f ~/.ssh/github_aur -y > ~/.ssh/github_aur.pub
         ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
         cat >> ~/.ssh/config<< EOF
         Host aur.archlinux.org
@@ -28,7 +37,7 @@ runs:
         EOF
 
         chmod 700 ~/.ssh
-        chmod -R 600 ~/.ssh/*
+        find ~/.ssh -type f -exec chmod 600 {} \;
 
         eval $(ssh-agent -s)
         ssh-add ~/.ssh/github_aur
@@ -40,8 +49,8 @@ runs:
         git config --global gpg.format ssh
         git config --global user.signingkey ~/.ssh/github_aur.pub
         git config --global commit.gpgsign true
-        git config --global user.email "${{ secrets.GIT_EMAIL }}"
-        git config --global user.name "${{ secrets.GIT_USER }}"
+        git config --global user.email "${{ inputs.commit-email }}"
+        git config --global user.name "${{ inputs.commit-user }}"
     - name: Commit and push to Github
       id: commit
       shell: bash

@@ -90,7 +90,7 @@ jobs:
         with:
           pkgname: ${{ matrix.package }}
           new-pkgver: ${{ steps.identify.outputs.pkgver }}
-      - name: Update PKGBULD and generate diff
+      - name: Update PKGBUILD and generate diff
         uses: ./.github/actions/updpkgsums
         id: update
         with:

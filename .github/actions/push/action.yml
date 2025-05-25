@@ -12,6 +12,15 @@ inputs:
   commit-msg:
     description: Commit message
     required: true
+  ssh-priv-key:
+    description: SSH private key
+    required: true
+  commit-user:
+    description: User name
+    required: true
+  commit-email:
+    description: User email
+    required: true
 
 runs:
   using: "composite"
@@ -51,8 +60,8 @@ runs:
           git config --global gpg.format ssh
           git config --global user.signingkey ~/.ssh/aur
           git config --global commit.gpgsign true
-        commit_username: ${{ secrets.GIT_USER }}
-        commit_email: ${{ secrets.GIT_EMAIL }}
-        ssh_private_key: ${{ secrets.SSH_KEY_PRIVATE }}
+        commit_username: ${{ inputs.commit-user }}
+        commit_email: ${{ inputs.commit-email }}
+        ssh_private_key: ${{ inputs.ssh-priv-key }}
         commit_message: ${{ inputs.commit-msg }}
         ssh_keyscan_types: ed25519
