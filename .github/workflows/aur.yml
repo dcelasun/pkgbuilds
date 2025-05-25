@@ -13,15 +13,16 @@ jobs:
       packages: ${{ steps.nvcheck.outputs.packages }}
       changes: ${{ steps.nvcheck.outputs.changes }}
       urls: ${{ steps.nvcheck.outputs.urls }}
+      new-versions: ${{ steps.nvcheck.outputs.new_versions }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
           ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
-      - name: Pull base image
+      - name: Pull Arch Linux image
         run: docker pull quay.io/aminvakil/archlinux:latest
-      - name: Prepare base image and mount packages
+      - name: Create keyfile
         run: |
           # Create keyfile to avoid Github rate limits
           # See https://nvchecker.readthedocs.io/en/latest/usage.html#configuration-table:~:text=toml%20config%20file%20containing%20key
@@ -29,7 +30,8 @@ jobs:
           [keys]
             github = "${{ secrets.GITHUB_TOKEN }}"
           EOF
-
+      - name: Prepare nvchecker
+        run: |
           container_id=$(mktemp)
           docker run --detach --privileged --cgroup-parent=docker.slice --cgroupns private --tmpfs /tmp --tmpfs /run --tmpfs /run/lock -v "${PWD}":/pkgbuilds quay.io/aminvakil/archlinux:latest > "${container_id}"
           docker exec "$(cat ${container_id})" pacman -Syu --noconfirm
@@ -50,6 +52,8 @@ jobs:
           pkgs=$(echo "$nvcmp_output" | jq -c '[.[].name]')
           echo "packages=$pkgs" >> $GITHUB_OUTPUT
           echo "changes=$nvcmp_output" >> $GITHUB_OUTPUT
+          new_versions=$(cat versions_new.json | jq -c)
+          echo "new_versions=$new_versions" >> $GITHUB_OUTPUT
 
           # Calculate release URLs
           urls=''
@@ -81,7 +85,7 @@ jobs:
 
           urls=$(echo "$urls" | jq -cs 'from_entries')
           echo "urls=$urls" >> $GITHUB_OUTPUT
-      - name: Stop and remove container
+      - name: Stop nvchecker
         run: |
           docker rm -f "$(cat ${container_id})"
 
@@ -107,6 +111,15 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
+      - name: Prepare nvchecker
+        run: |
+          echo '${{ needs.define-matrix.outputs.new-versions }}' > versions_new.json
+
+          container_id=$(mktemp)
+          docker run --detach --privileged --cgroup-parent=docker.slice --cgroupns private --tmpfs /tmp --tmpfs /run --tmpfs /run/lock -v "${PWD}":/pkgbuilds quay.io/aminvakil/archlinux:latest > "${container_id}"
+          docker exec "$(cat ${container_id})" pacman -Syu --noconfirm
+          docker exec "$(cat ${container_id})" pacman -S nvchecker --noconfirm
+          echo "container_id=$container_id" >> $GITHUB_ENV
       - name: Prepare commit message
         uses: ./.github/actions/prepare-commit-msg
         id: prep
@@ -120,6 +133,9 @@ jobs:
           pkgname: ${{ matrix.package }}
           new-pkgver: ${{ steps.identify.outputs.pkgver }}
           skip-makepkg: ${{ matrix.package == 'firefox-vaapi' && 'yes' || 'no' }}
+      - name: Run nvtake
+        run: |
+          docker exec "$(cat ${container_id})" nvtake -c /pkgbuilds/nvchecker.toml ${{ matrix.package }}
       - name: Configure git and SSH
         uses: ./.github/actions/configure-git-ssh
         id: configure
@@ -141,3 +157,6 @@ jobs:
           delete-branch: true
           signoff: false
           draft: false
+      - name: Stop nvchecker
+        run: |
+          docker rm -f "$(cat ${container_id})"
