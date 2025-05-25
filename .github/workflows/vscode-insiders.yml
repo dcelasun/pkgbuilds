@@ -76,6 +76,7 @@ jobs:
           echo "new_pkgrel=1" >> $GITHUB_OUTPUT
   update-insiders:
     name: Update package
+    if: needs.setup.outputs.new_pkgver != '' || needs.setup.outputs.new_pkgrel != ''
     uses: ./.github/workflows/base.yml
     needs: setup
     secrets: inherit
