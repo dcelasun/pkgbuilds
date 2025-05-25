@@ -1,6 +1,10 @@
 name: Check for updates
 on:
   workflow_dispatch:
+  schedule:
+    # Github recommends avoiding full hours
+    # See https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#schedule
+    - cron: "38 1,9,17 * * *" # At minute 38 every 8 hours
 
 jobs:
   define-matrix:
