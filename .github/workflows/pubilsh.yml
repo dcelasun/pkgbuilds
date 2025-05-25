@@ -1,0 +1,78 @@
+name: Publish to AUR
+run-name: Publish latest ${{ inputs.pkgname }} to AUR
+on:
+  push:
+    branches:
+      - $default-branch
+  workflow_dispatch:
+    inputs:
+      pkgname:
+        type: string
+        required: true
+        description: "Package name"
+
+jobs:
+  pkgnames:
+    runs-on: ubuntu-latest
+    outputs:
+      pkgnames: ${{ steps.pkgnames.outputs.result }}
+    steps:
+      - name: Identify pkgnames
+        uses: actions/github-script@v6
+        id: pkgnames
+        with:
+          script: |
+            const isPackageCommit = /^\[([\w\-\d]+)\]/;
+            const hasSkipCI = /(\[skip-ci\])/;
+
+            const commits = ${{ toJSON(github.event.commits) }}
+            if ( commits.length == 0) {
+              if ( "${{ inputs.pkgname }}".length > 0 ) {
+                return '["${{ inputs.pkgname }}"]'
+              }
+              return '[]'
+            }
+            const packages = commits.filter(function (commit) {
+              return isPackageCommit.test(commit.message) && !hasSkipCI.test(commit.message)
+            }).map(function (commit) {
+              return commit.message.match(isPackageCommit)[1]
+            })
+            return JSON.stringify(packages)
+  push:
+    if: needs.pkgnames.outputs.pkgnames != '[]'
+    needs: pkgnames
+    strategy:
+      fail-fast: false
+      matrix:
+        pkgname: ${{ fromJSON(needs.pkgnames.outputs.pkgnames) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
+      - name: Calculate pkgver and pkgrel
+        id: pkg
+        run: |
+          pkgver=$(awk 'match($0, "^pkgver=([a-zA-Z0-9_.]+)$", arr) {print arr[1]}' ${{ matrix.pkgname }}/PKGBUILD)
+          pkgrel=$(awk 'match($0, "^pkgrel=([0-9]+)$", arr) {print arr[1]}' ${{ matrix.pkgname }}/PKGBUILD)
+          echo "new_pkgver=$pkgver" >> $GITHUB_OUTPUT
+          echo "new_pkgrel=$pkgrel" >> $GITHUB_OUTPUT
+      - name: Prepare commit message
+        uses: ./.github/actions/prepare-commit-msg
+        id: prep
+        with:
+          pkgname: ${{ matrix.pkgname }}
+          new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
+          new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
+      - name: Push to AUR
+        uses: ./.github/actions/push-to-aur
+        with:
+          pkgname: ${{ matrix.pkgname }}
+          commit-msg: ${{ steps.prep.outputs.commit-msg }}
+          new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
+          new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
+          commit-email: ${{ secrets.GIT_EMAIL }}
+          commit-user: ${{ secrets.GIT_USER }}
+          ssh-priv-key: ${{ secrets.SSH_KEY_PRIVATE }}
