@@ -10,39 +10,40 @@ jobs:
       changes: ${{ steps.nvcheck.outputs.changes }}
       urls: ${{ steps.nvcheck.outputs.urls }}
     steps:
-      - name: Check out
+      - name: Clone repository
         uses: actions/checkout@v4
-
+        with:
+          ref: ${{ github.head_ref }}
+          ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
       - name: Pull base image
         run: docker pull quay.io/aminvakil/archlinux:latest
-
       - name: Prepare base image and mount packages
         run: |
           container_id=$(mktemp)
           docker run --detach --privileged --cgroup-parent=docker.slice --cgroupns private --tmpfs /tmp --tmpfs /run --tmpfs /run/lock -v "${PWD}":/pkgbuilds quay.io/aminvakil/archlinux:latest > "${container_id}"
           docker exec "$(cat ${container_id})" pacman -Syu --noconfirm
-          docker exec "$(cat ${container_id})" pacman -S nvchecker git pyalpm python-packaging python-jq yq --noconfirm
+          docker exec "$(cat ${container_id})" pacman -S nvchecker git pyalpm python-packaging python-jq --noconfirm
           echo "container_id=$container_id" >> $GITHUB_ENV
-
       - name: Run nvchecker
         id: nvcheck
         run: |
+          sudo apt-get -y install yq # needed for tomlq
           docker exec "$(cat ${container_id})" nvchecker --failures -c /pkgbuilds/nvchecker.toml
-          aur_nvcmp_output=$(docker exec "$(cat ${container_id})" nvcmp -c /pkgbuilds/nvchecker.toml -j)
-          if [ -z "aur_nvcmp_output" ]; then
+          nvcmp_output=$(docker exec "$(cat ${container_id})" nvcmp -c /pkgbuilds/nvchecker.toml -j)
+          if [ -z "$nvcmp_output" ]; then
             echo "::notice ::No new versions found"
             exit 0
           fi
 
-          pkgs=$(echo "aur_nvcmp_output" | jq -c '[.[].name]')
+          pkgs=$(echo "$nvcmp_output" | jq -c '[.[].name]')
           echo "packages=$pkgs" >> $GITHUB_OUTPUT
-          echo "changes=$cmp" >> $GITHUB_OUTPUT
+          echo "changes=$nvcmp_output" >> $GITHUB_OUTPUT
 
           # Calculate release URLs
           urls=''
-          pkgs=$(echo "$cmp" | jq -c '[.[].name]')
+          pkgs=$(echo "$nvcmp_output" | jq -c '[.[].name]')
           while read -r pkg; do
-          version=$(echo "$cmp" | jq -r '.[] | select(.name=="'${pkg}'").newver')
+          version=$(echo "$nvcmp_output" | jq -r '.[] | select(.name=="'${pkg}'").newver')
           expr=$(printf '."%s"' "$pkg")
           src=$(tomlq -r ${expr}.source nvchecker.toml)
 
@@ -74,16 +75,22 @@ jobs:
     needs: define-matrix
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        package: ${{ needs.define-matrix.outputs.packages }}
+        package: ${{ fromJSON(needs.define-matrix.outputs.packages) }}
     steps:
       - name: Identify version and release URL
         id: identify
         run: |
-          newver=$(echo "${{ needs.define-matrix.outputs.changes }}" | jq '.[] | select(.name=="${{ matrix.package }}").newver)
-          url=$(echo "${{ needs.define-matrix.outputs.urls }}" | jq '."${{ matrix.package }}"')
+          newver=$(echo '${{ needs.define-matrix.outputs.changes }}' | jq -r '.[] | select(.name=="${{ matrix.package }}").newver')
+          url=$(echo '${{ needs.define-matrix.outputs.urls }}' | jq -r '."${{ matrix.package }}"')
           echo "pkgver=$newver" >> $GITHUB_OUTPUT
           echo "url=$url" >> $GITHUB_OUTPUT
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
       - name: Prepare commit message
         uses: ./.github/actions/prepare-commit-msg
         id: prep
@@ -96,7 +103,7 @@ jobs:
         with:
           pkgname: ${{ matrix.package }}
           new-pkgver: ${{ steps.identify.outputs.pkgver }}
-          skip-makepkg: ${{ matrix.package != 'firefox-vaapi' && 'yes' || 'no' }}
+          skip-makepkg: ${{ matrix.package == 'firefox-vaapi' && 'yes' || 'no' }}
       - name: Create PR
         if: github.event_name != 'pull_request'
         uses: peter-evans/create-pull-request@v6
