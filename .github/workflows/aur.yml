@@ -58,6 +58,9 @@ jobs:
             url=$(printf "https://github.com/${repo}/releases/tag/${pfx}${version}")
           else
             url=$(tomlq -r ${expr}.release_url nvchecker.toml)
+            if [ -z "$url" ]; then
+              url=$(tomlq -r ${expr}.url nvchecker.toml)
+            fi
             url=$(echo "$url" | sed 's/__version__/'${version}'/g')
           fi
 

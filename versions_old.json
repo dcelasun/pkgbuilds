@@ -1,11 +1,116 @@
 {
   "version": 2,
   "data": {
-    "firefox-vaapi": {
-      "version": "138.0"
+    "amazon-ecr-credential-helper": {
+      "version": "0.9.1",
+      "gitref": "refs/tags/v0.9.1",
+      "revision": "6540026091fe97d68c5e653b754cac6a3f5937ee",
+      "url": "https://github.com/awslabs/amazon-ecr-credential-helper/releases/tag/v0.9.1"
+    },
+    "aranet4": {
+      "version": "0.11.1",
+      "gitref": "refs/tags/v0.11.1",
+      "revision": "705e8d965d315eefe5916050d9d5353a4bab06ba"
     },
     "aws-nuke-bin": {
-      "version": "3.54.0"
+      "version": "3.55.0",
+      "gitref": "refs/tags/v3.55.0",
+      "revision": "938a03e48ad48d052f88e46d3beac6d1534ea0d2",
+      "url": "https://github.com/ekristen/aws-nuke/releases/tag/v3.55.0"
+    },
+    "basemark": {
+      "version": "1.2.3"
+    },
+    "cloudquery-cli": {
+      "version": "6.15.5",
+      "gitref": "refs/tags/cli-v6.15.5",
+      "url": "https://github.com/cloudquery/cloudquery/releases/tag/cli-v6.15.5"
+    },
+    "commafeed": {
+      "version": "5.9.0",
+      "gitref": "refs/tags/5.9.0",
+      "revision": "fad0aea1088f15a9b5a5c382e65c55d52f456706",
+      "url": "https://github.com/Athou/commafeed/releases/tag/5.9.0"
+    },
+    "downlords-faf-client": {
+      "version": "2025.2.1",
+      "gitref": "refs/tags/v2025.2.1",
+      "revision": "355071ed46ac5bcf731b8d1c23ceb9349c8eb7f2",
+      "url": "https://github.com/FAForever/downlords-faf-client/releases/tag/v2025.2.1"
+    },
+    "firefox-vaapi": {
+      "version": "138.0.4"
+    },
+    "golangci-lint-v1-bin": {
+      "version": "1.64.8",
+      "gitref": "refs/tags/v1.64.8",
+      "revision": "8b37f14162043f908949f1b363d061dc9ba713c0",
+      "url": "https://github.com/golangci/golangci-lint/releases/tag/v1.64.8"
+    },
+    "intellij-idea-ultimate-edition": {
+      "version": "2025.1.1.1"
+    },
+    "jet": {
+      "version": "2.15.0"
+    },
+    "kepubify-bin": {
+      "version": "4.0.4",
+      "gitref": "refs/tags/v4.0.4",
+      "revision": "8e959eda11d783041fc03c1a8109275a27f2f2dc",
+      "url": "https://github.com/pgaskin/kepubify/releases/tag/v4.0.4"
+    },
+    "kodi-nfo-generator": {
+      "version": "0.0.16",
+      "gitref": "refs/tags/v0.0.16",
+      "revision": "a2a20823b9a4c7ce300392b3ae61547b7729e2ba",
+      "url": "https://github.com/fracpete/kodi-nfo-generator/releases/tag/v0.0.16"
+    },
+    "ksuid": {
+      "version": "1.0.4",
+      "gitref": "refs/tags/v1.0.4",
+      "revision": "28dc167a7824cd876a4cf3ce6f1bdaa1dda7c9c2",
+      "url": "https://github.com/segmentio/ksuid/releases/tag/v1.0.4"
+    },
+    "nut-monitor": {
+      "version": "2.8.2"
+    },
+    "owntracks-frontend": {
+      "version": "2.15.3",
+      "gitref": "refs/tags/v2.15.3",
+      "revision": "9839b5acdd66cd7db5b86a82eb7be152fb50d6cc",
+      "url": "https://github.com/owntracks/frontend/releases/tag/v2.15.3"
+    },
+    "paradox-launcher": {
+      "version": "2025.1"
+    },
+    "snowflake-client": {
+      "version": "1.4.0"
+    },
+    "snowflake-odbc": {
+      "version": "3.6.0"
+    },
+    "unigine-tropics": {
+      "version": "1.3"
+    },
+    "unrpyc": {
+      "version": "2.0.2",
+      "gitref": "refs/tags/v2.0.2",
+      "revision": "e16a767bbdd75abcf47a318b20480db4a07f7dfa",
+      "url": "https://github.com/CensoredUsername/unrpyc/releases/tag/v2.0.2"
+    },
+    "vertica-client": {
+      "version": "24.2.0"
+    },
+    "visual-studio-code-bin": {
+      "version": "1.100.2",
+      "gitref": "refs/tags/1.100.2",
+      "url": "https://github.com/microsoft/vscode/releases/tag/1.100.2"
+    },
+    "writerscafe": {
+      "version": "2.44"
+    },
+    "xerox-phaser-3040": {
+      "version": "1.0"
     }
   }
 }

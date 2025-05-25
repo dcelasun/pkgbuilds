@@ -2,14 +2,153 @@
 oldver = "versions_old.json"
 newver = "versions_new.json"
 
-[firefox-vaapi]
-source = "jq"
-url = "https://product-details.mozilla.org/1.0/firefox_versions.json"
-filter = ".LATEST_FIREFOX_VERSION"
-release_url = "https://www.mozilla.org/en-US/firefox/__version__/releasenotes/"
+[amazon-ecr-credential-helper]
+source = "github"
+github = "awslabs/amazon-ecr-credential-helper"
+use_max_tag = true
+prefix = "v"
+
+[aranet4]
+source = "git"
+git = "https://git.sr.ht/~sbinet/aranet4"
+release_url = "https://git.sr.ht/~sbinet/aranet4/refs/v__version__"
+prefix = "v"
 
 [aws-nuke-bin]
 source = "github"
 github = "ekristen/aws-nuke"
 use_max_tag = true
 prefix = "v"
+
+[basemark]
+source = "regex"
+url = "https://www.gpuscore.com/benchmarks/basemark-gpu/"
+encoding = "utf-8"
+regex = 'BasemarkGPU-linux-x64-([\d.]+)\.tar\.gz'
+
+[cloudquery-cli]
+source = "github"
+github = "cloudquery/cloudquery"
+use_max_release = true
+include_regex = '^cli-v[\d.]+$'
+prefix = "cli-v"
+
+[commafeed]
+source = "github"
+github = "Athou/commafeed"
+use_max_tag = true
+prefix = "v"
+
+[downlords-faf-client]
+source = "github"
+github = "FAForever/downlords-faf-client"
+use_max_tag = true
+prefix = "v"
+
+[firefox-vaapi]
+source = "jq"
+url = "https://product-details.mozilla.org/1.0/firefox_versions.json"
+filter = ".LATEST_FIREFOX_VERSION"
+release_url = "https://www.mozilla.org/en-US/firefox/__version__/releasenotes/"
+
+[golangci-lint-v1-bin]
+source = "github"
+github = "golangci/golangci-lint"
+use_max_tag = true
+include_regex = '^v1\.[\d.]+$'
+prefix = "v"
+
+[intellij-idea-ultimate-edition]
+source = "jq"
+url = "https://data.services.jetbrains.com/products/releases?code=IIU&latest=true&type=release&build="
+encoding = "utf-8"
+filter = '.IIU[0].version'
+release_url = "https://www.jetbrains.com/idea/download/?section=linux"
+
+[jet]
+source = "regex"
+url = "https://docs.cloudbees.com/docs/cloudbees-codeship/latest/pro-jet-cli/installation"
+release_url = "https://docs.cloudbees.com/docs/cloudbees-codeship/latest/pro-jet-cli/release-notes"
+regex = 'jet-linux_amd64_([\d.]+)\.tar\.gz'
+
+[kepubify-bin]
+source = "github"
+github = "pgaskin/kepubify"
+use_max_tag = true
+prefix = "v"
+
+[kodi-nfo-generator]
+source = "github"
+github = "fracpete/kodi-nfo-generator"
+use_max_tag = true
+prefix = "v"
+
+[ksuid]
+source = "github"
+github = "segmentio/ksuid"
+use_max_tag = true
+prefix = "v"
+
+[nut-monitor]
+source = "regex"
+url = "https://networkupstools.org/download.html"
+regex = 'source\/[\d.]+\/nut-([\d.]+)\.tar\.gz'
+
+[owntracks-frontend]
+source = "github"
+github = "owntracks/frontend"
+use_max_tag = true
+prefix = "v"
+
+[paradox-launcher]
+source = "httpheader"
+url = "https://launcher.paradoxinteractive.com/v2/paradox-launcher-installer-linux"
+release_url = "https://www.paradoxinteractive.com/our-games/launcher"
+follow_redirects = false
+header = 'location'
+method = "HEAD"
+regex = 'paradox-launcher-installer-([\d_]+)\.deb'
+from_pattern = '_'
+to_pattern = '.'
+
+[snowflake-client]
+source = "regex"
+url = "https://www.snowflake.com/en/developers/downloads/snowsql/"
+regex = 'snowsql\/bootstrap\/\d\.\d\/linux_x86_64\/snowsql-([\d.]+)-linux_x86_64\.bash'
+
+[snowflake-odbc]
+source = "regex"
+url = "https://www.snowflake.com/en/developers/downloads/odbc/"
+regex = 'odbc\/linux\/[\d.]+\/snowflake_linux_x8664_odbc-([\d.]+)\.tgz'
+
+[unigine-tropics]
+source = "regex"
+url = "https://benchmark.unigine.com/tropics"
+regex = 'assets\.unigine\.com\/d\/Unigine_Tropics-([\d.]+)\.run'
+
+[unrpyc]
+source = "github"
+github = "CensoredUsername/unrpyc"
+use_max_tag = true
+prefix = "v"
+
+[vertica-client]
+source = "regex"
+url = "https://www.vertica.com/download/vertica/client-drivers/"
+regex = 'client_drivers\/[\d.x]+/[\d.-]+\/vertica-client-([\d.]+)(?:[\d-]+)\.x86_64\.tar\.gz'
+
+[visual-studio-code-bin]
+source = "github"
+github = "microsoft/vscode"
+use_max_release = true
+prefix = "v"
+
+[writerscafe]
+source = "regex"
+url = "http://www.anthemion.co.uk/writerscafe/download.htm"
+regex = 'WritersCafe-([\d.]+)-ubuntu-x86_64\.tar\.gz'
+
+[xerox-phaser-3040]
+source = "regex"
+url = "https://www.support.xerox.com/en-in/product/phaser-3040/downloads?language=en_GB&platform=linux"
+regex = 'Xerox-Phaser-3010_3040-([\d.]+)-[\d]+\.i586\.zip'
