@@ -106,7 +106,7 @@ jobs:
           skip-makepkg: ${{ matrix.package == 'firefox-vaapi' && 'yes' || 'no' }}
       - name: Create PR
         if: github.event_name != 'pull_request'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: ${{ steps.prep.outputs.commit-msg }}
