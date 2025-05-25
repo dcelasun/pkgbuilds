@@ -15,11 +15,6 @@ inputs:
       Useful for large packages that can't be built on Github, like firefox-vaapi.
     default: 'no'
 
-outputs:
-  diff-artifact-id:
-    description: Github artifact ID containing a "diff.patch" file in "git diff" format
-    value: ${{ steps.upload.outputs.artifact-id }}
-
 runs:
   using: "composite"
   steps:
@@ -58,14 +53,3 @@ runs:
         pkgver: '${{ inputs.new-pkgver }}'
         pkgrel: '${{ inputs.new-pkgrel }}'
         flags: ${{ inputs.skip-makepkg == 'no' && '-cfs --noconfirm' || '' }}
-    - name: Generate diff
-      shell: bash
-      run: |
-        git diff > diff.patch
-    - name: Upload diff
-      uses: actions/upload-artifact@v4
-      id: upload
-      with:
-        path: diff.patch
-        if-no-files-found: 'error'
-        retention-days: '1'

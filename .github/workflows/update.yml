@@ -56,10 +56,6 @@ jobs:
           new-pkgver: ${{ inputs.pkgver }}
           new-pkgrel: ${{ inputs.pkgrel }}
           skip-makepkg: ${{ inputs.skip-makepkg }}
-      - name: Apply diff
-        uses: ./.github/actions/apply-diff
-        with:
-          diff-artifact-id: ${{ steps.update.outputs.diff-artifact-id }}
       - name: Commit to Github and push
         uses: ./.github/actions/commit
         with:

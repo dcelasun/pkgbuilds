@@ -97,10 +97,6 @@ jobs:
           pkgname: ${{ matrix.package }}
           new-pkgver: ${{ steps.identify.outputs.pkgver }}
           skip-makepkg: ${{ matrix.package != 'firefox-vaapi' && 'yes' || 'no' }}
-      - name: Apply diff
-        uses: ./.github/actions/apply-diff
-        with:
-          diff-artifact-id: ${{ steps.update.outputs.diff-artifact-id }}
       - name: Create PR
         if: github.event_name != 'pull_request'
         uses: peter-evans/create-pull-request@v6

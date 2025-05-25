@@ -88,15 +88,9 @@ jobs:
           new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
           new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
           skip-makepkg: 'no'
-      - name: Apply diff
-        uses: ./.github/actions/apply-diff
-        if: steps.update.outcome == 'success'
-        id: diff
-        with:
-          diff-artifact-id: ${{ steps.update.outputs.diff-artifact-id }}
       - name: Commit to Github and push
         uses: ./.github/actions/commit
-        if: steps.diff.outcome == 'success'
+        if: steps.update.outcome == 'success'
         id: commit
         with:
           commit-msg: ${{ steps.prep.outputs.commit-msg }}
