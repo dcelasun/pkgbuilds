@@ -1,8 +1,5 @@
 name: Update visual-studio-code-insiders-bin
 on:
-  pull_request:
-    branches:
-      - $default-branch
   workflow_dispatch:
     inputs:
       force-update:
