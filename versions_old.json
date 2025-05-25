@@ -3,6 +3,9 @@
   "data": {
     "firefox-vaapi": {
       "version": "138.0"
+    },
+    "aws-nuke-bin": {
+      "version": "3.54.0"
     }
   }
 }

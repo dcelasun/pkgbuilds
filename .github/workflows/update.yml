@@ -33,13 +33,42 @@ on:
           - 'no'
 
 jobs:
-  update:
-    name: Update package
-    uses: ./.github/workflows/base.yml
-    secrets: inherit
-    with:
-      pkgname: ${{ inputs.pkgname }}
-      new-pkgver: ${{ inputs.pkgver }}
-      new-pkgrel: ${{ inputs.pkgrel }}
-      publish-to-aur: ${{ inputs.publish }}
-      skip-makepkg: ${{ inputs.skip-makepkg }}
+  do:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
+      - name: Prepare commit message
+        uses: ./.github/actions/prepare-commit-msg
+        id: prep
+        with:
+          pkgname: ${{ env.PKGNAME }}
+          new-pkgver: ${{ inputs.pkgver }}
+          new-pkgrel: ${{ inputs.pkgrel }}
+      - name: Update PKGBULD and generate diff
+        uses: ./.github/actions/updpkgsums
+        id: update
+        with:
+          pkgname: ${{ env.PKGNAME }}
+          new-pkgver: ${{ inputs.pkgver }}
+          new-pkgrel: ${{ inputs.pkgrel }}
+          skip-makepkg: ${{ inputs.skip-makepkg }}
+      - name: Apply diff
+        uses: ./.github/actions/apply-diff
+        with:
+          diff-artifact-id: ${{ steps.update.outputs.diff-artifact-id }}
+      - name: Commit to Github and push
+        uses: ./.github/actions/commit
+        with:
+          commit-msg: ${{ steps.prep.outputs.commit-msg }}
+      - name: Push to AUR
+        uses: ./.github/actions/push
+        if: inputs.publish == 'yes'
+        with:
+          pkgname: ${{ env.PKGNAME }}
+          commit-msg: ${{ steps.prep.outputs.commit-msg }}
+          new-pkgver: ${{ inputs.pkgver }}
+          new-pkgrel: ${{ inputs.pkgrel }}

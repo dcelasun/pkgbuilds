@@ -1,79 +1,117 @@
-name: AUR
-'on':
+name: Check for updates
+on:
   workflow_dispatch:
 
 jobs:
-
-  AUR:
-    name: AUR
+  define-matrix:
     runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.nvcheck.outputs.packages }}
+      changes: ${{ steps.nvcheck.outputs.changes }}
+      urls: ${{ steps.nvcheck.outputs.urls }}
     steps:
-      - name: Check out the codebase.
-        uses: actions/checkout@v3
+      - name: Check out
+        uses: actions/checkout@v4
 
-      - name: Pull base image.
+      - name: Pull base image
         run: docker pull quay.io/aminvakil/archlinux:latest
 
-      - name: Run a container of base image and mount package on it.
+      - name: Prepare base image and mount packages
         run: |
           container_id=$(mktemp)
           docker run --detach --privileged --cgroup-parent=docker.slice --cgroupns private --tmpfs /tmp --tmpfs /run --tmpfs /run/lock -v "${PWD}":/pkgbuilds quay.io/aminvakil/archlinux:latest > "${container_id}"
+          docker exec "$(cat ${container_id})" pacman -Syu --noconfirm
+          docker exec "$(cat ${container_id})" pacman -S nvchecker git pyalpm python-packaging python-jq yq --noconfirm
           echo "container_id=$container_id" >> $GITHUB_ENV
 
-      - name: pacman -Syu
-        run: docker exec "$(cat ${container_id})" pacman -Syu --noconfirm
-
-      - name: Install nvchecker and git.
-        run: docker exec "$(cat ${container_id})" pacman -S nvchecker git pyalpm python-packaging python-jq --noconfirm
-
-      - name: Nvcheck!
+      - name: Run nvchecker
+        id: nvcheck
         run: |
           docker exec "$(cat ${container_id})" nvchecker --failures -c /pkgbuilds/nvchecker.toml
-          aur_nvcmp_output=$(docker exec "$(cat ${container_id})" nvcmp -c /pkgbuilds/nvchecker.toml)
-          nvchecker_source=$(docker exec "$(cat ${container_id})" awk "/\[$(echo $aur_nvcmp_output | awk '{print $1}')\]/{getline; print}" /pkgbuilds/nvchecker.toml | awk '{print $3}' | tr -d '"')
-          nvchecker_repository=$(docker exec "$(cat ${container_id})" awk "/\[$(echo $aur_nvcmp_output | awk '{print $1}')\]/{getline; getline; print}" /pkgbuilds/nvchecker.toml | awk '{print $3}' | tr -d '"')
-          nvchecker_prefix=$(docker exec "$(cat ${container_id})" awk "/\[$(echo $aur_nvcmp_output | awk '{print $1}')\]/{getline; getline; getline; getline; print}" /pkgbuilds/nvchecker.toml | awk '{print $3}' | tr -d '"')
-          new_version=$(echo ${aur_nvcmp_output} | awk '{print $4}')
-          case "$nvchecker_source" in
-          ("github")
-          release_url="https://github.com/${nvchecker_repository}/releases/tag/${nvchecker_prefix}${new_version}"
-          ;;
-          (*)
-          release_url=None
-          ;;
-          esac
-          if [[ $aur_nvcmp_output ]]; then AUR_HAS_CHANGED='true' ; fi
-          echo "AUR_HAS_CHANGED=$AUR_HAS_CHANGED" >> $GITHUB_ENV
-          echo 'aur_nvcmp_output<<EOF' >> $GITHUB_ENV
-          echo $aur_nvcmp_output >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
-          echo "release_url=${release_url}" >> $GITHUB_ENV
-          mv versions_new.json versions_old.json
+          aur_nvcmp_output=$(docker exec "$(cat ${container_id})" nvcmp -c /pkgbuilds/nvchecker.toml -j)
+          if [ -z "aur_nvcmp_output" ]; then
+            echo "::notice ::No new versions found"
+            exit 0
+          fi
 
-      # - name: Create AUR Issue.
-      #   id: aur-create-issue
-      #   if: env.AUR_HAS_CHANGED == 'true' && github.event_name != 'pull_request'
-      #   uses: JasonEtco/create-an-issue@v2
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     update_existing: true
-      #     filename: .github/AUR_ISSUE_TEMPLATE.md
+          pkgs=$(echo "aur_nvcmp_output" | jq -c '[.[].name]')
+          echo "packages=$pkgs" >> $GITHUB_OUTPUT
+          echo "changes=$cmp" >> $GITHUB_OUTPUT
 
-      - name: Create AUR Pull Request
-        if: env.AUR_HAS_CHANGED == 'true' && github.event_name != 'pull_request'
+          # Calculate release URLs
+          urls=''
+          pkgs=$(echo "$cmp" | jq -c '[.[].name]')
+          while read -r pkg; do
+          version=$(echo "$cmp" | jq -r '.[] | select(.name=="'${pkg}'").newver')
+          expr=$(printf '."%s"' "$pkg")
+          src=$(tomlq -r ${expr}.source nvchecker.toml)
+
+          url=''
+          if [ "${src}" == "github" ]; then
+            repo=$(tomlq -r ${expr}.github nvchecker.toml)
+            pfx=$(tomlq -r ${expr}.prefix nvchecker.toml)
+            url=$(printf "https://github.com/${repo}/releases/tag/${pfx}${version}")
+          else
+            url=$(tomlq -r ${expr}.release_url nvchecker.toml)
+            url=$(echo "$url" | sed 's/__version__/'${version}'/g')
+          fi
+
+          if [ -z "$url" ]; then
+            url='None'
+          fi
+
+          urls+=$(echo "${pkg}=${url}" | jq -R './"=" | {key:first,value:last}')
+          done <<< "$(echo $pkgs | jq -r '.[]')"
+
+          urls=$(echo "$urls" | jq -cs 'from_entries')
+          echo "urls=$urls" >> $GITHUB_OUTPUT
+      - name: Stop and remove container
+        run: |
+          docker rm -f "$(cat ${container_id})"
+
+  create-prs:
+    name: Create PR for ${{ matrix.package }}
+    needs: define-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ${{ needs.define-matrix.outputs.packages }}
+    steps:
+      - name: Identify version and release URL
+        id: identify
+        run: |
+          newver=$(echo "${{ needs.define-matrix.outputs.changes }}" | jq '.[] | select(.name=="${{ matrix.package }}").newver)
+          url=$(echo "${{ needs.define-matrix.outputs.urls }}" | jq '."${{ matrix.package }}"')
+          echo "pkgver=$newver" >> $GITHUB_OUTPUT
+          echo "url=$url" >> $GITHUB_OUTPUT
+      - name: Prepare commit message
+        uses: ./.github/actions/prepare-commit-msg
+        id: prep
+        with:
+          pkgname: ${{ matrix.package }}
+          new-pkgver: ${{ steps.identify.outputs.pkgver }}
+      - name: Update PKGBULD and generate diff
+        uses: ./.github/actions/updpkgsums
+        id: update
+        with:
+          pkgname: ${{ matrix.package }}
+          new-pkgver: ${{ steps.identify.outputs.pkgver }}
+          skip-makepkg: ${{ matrix.package != 'firefox-vaapi' && 'yes' || 'no' }}
+      - name: Apply diff
+        uses: ./.github/actions/apply-diff
+        with:
+          diff-artifact-id: ${{ steps.update.outputs.diff-artifact-id }}
+      - name: Create PR
+        if: github.event_name != 'pull_request'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: ${{ env.aur_nvcmp_output }}
+          commit-message: ${{ steps.prep.outputs.commit-msg }}
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: false
-          branch: aurbump
+          branch: aur/${{ matrix.package }}
           delete-branch: true
-          title: 'AUR Bump'
-          body: ${{ env.release_url }}
+          title: "Update ${{ matrix.package }} to ${{ steps.identify.outputs.pkgver }}"
+          body: ${{ steps.identify.outputs.url }}
           draft: false
-
-      - name: Stop and remove container forcefully.
-        run: docker rm -f "$(cat ${container_id})"

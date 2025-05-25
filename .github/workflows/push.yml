@@ -9,14 +9,8 @@ on:
         description: "Package name"
 
 jobs:
-  setup:
-    # See link for why this is needed
-    # https://github.com/orgs/community/discussions/26671#discussioncomment-3252793
-    name: Setup
+  do:
     runs-on: ubuntu-latest
-    outputs:
-      new_pkgver: ${{ steps.pkg.outputs.new_pkgver }}
-      new_pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -30,15 +24,17 @@ jobs:
           pkgrel=$(awk 'match($0, "^pkgrel=([0-9]+)$", arr) {print arr[1]}' ${{ inputs.pkgname }}/PKGBUILD)
           echo "new_pkgver=$pkgver" >> $GITHUB_OUTPUT
           echo "new_pkgrel=$pkgrel" >> $GITHUB_OUTPUT
-  update:
-    name: Push package
-    needs: setup
-    uses: ./.github/workflows/base.yml
-    secrets: inherit
-    with:
-      pkgname: ${{ inputs.pkgname }}
-      new-pkgver: ${{ needs.setup.outputs.new_pkgver }}
-      new-pkgrel: ${{ needs.setup.outputs.new_pkgrel }}
-      publish-to-aur: 'yes'
-      skip-makepkg: 'yes'
-      skip-commit: 'yes'
+      - name: Prepare commit message
+        uses: ./.github/actions/prepare-commit-msg
+        id: prep
+        with:
+          pkgname: ${{ inputs.pkgname }}
+          new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
+          new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
+      - name: Push to AUR
+        uses: ./.github/actions/push
+        with:
+          pkgname: ${{ inputs.pkgname }}
+          commit-msg: ${{ steps.prep.outputs.commit-msg }}
+          new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
+          new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}

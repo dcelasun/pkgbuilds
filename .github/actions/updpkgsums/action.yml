@@ -1,0 +1,71 @@
+name: updpkgsums and .SRCINFO
+inputs:
+  pkgname:
+    description: Package name
+    required: true
+  new-pkgver:
+    description: New pkgver
+    required: false
+  new-pkgrel:
+    description: New pkgrel
+    required: false
+  skip-makepkg:
+    description: |
+      Skip makepkg, commit after updating PKGBUILD.
+      Useful for large packages that can't be built on Github, like firefox-vaapi.
+    default: 'no'
+
+outputs:
+  diff-artifact-id:
+    description: Github artifact ID containing a "diff.patch" file in "git diff" format
+    value: ${{ steps.upload.outputs.artifact-id }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Validate inputs
+      shell: bash
+      run: |
+        if [ -z "${{ inputs.pkgname }}" ]; then
+          echo "::error ::pkgname is empty"
+          exit 1
+        fi
+        if [ ! -d "${{ inputs.pkgname }}" ]; then
+          echo "::error ::package ${{ inputs.pkgname }} does not exist"
+          exit 1
+        fi
+
+        if [ -z "${{ inputs.new-pkgver }}" ] && [ -z "${{ inputs.new-pkgrel }}" ]; then
+          echo "::error ::new-pkgver and new-pkgrel both empty"
+          exit 1
+        fi
+
+        if [ ! -z "${{ inputs.new-pkgver }}" ]; then
+          valid=$(printf "${{ inputs.new-pkgver }}" | awk 'match($0, "^([a-zA-Z0-9_.]+)$", arr) {print arr[1]}')
+          if [ -z "$valid" ]]; then
+            echo "::error ::pkgver can only contain letters, numbers, dots and underscores"
+            exit 1
+          fi
+        fi
+    - name: "Update checksums & .SRCINFO"
+      id: updpkgsums
+      uses: dcelasun/archlinux-package-action@37a7b00ba9b402edce0bf04aa82229800eec516c # 24-May-2025
+      with:
+        path: ${{ inputs.pkgname }}
+        updpkgsums: true
+        srcinfo: true
+        namcap: false
+        pkgver: '${{ inputs.new-pkgver }}'
+        pkgrel: '${{ inputs.new-pkgrel }}'
+        flags: ${{ inputs.skip-makepkg == 'no' && '-cfs --noconfirm' || '' }}
+    - name: Generate diff
+      shell: bash
+      run: |
+        git diff > diff.patch
+    - name: Upload diff
+      uses: actions/upload-artifact@v4
+      id: upload
+      with:
+        path: diff.patch
+        if-no-files-found: 'error'
+        retention-days: '1'

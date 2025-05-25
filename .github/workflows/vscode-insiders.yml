@@ -17,15 +17,12 @@ on:
     # See https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#schedule
     - cron: "21 1 * * *" # 01:21 every day
 
+env:
+  PKGNAME: visual-studio-code-insiders-bin
+
 jobs:
-  setup:
-    # See link for why this is needed
-    # https://github.com/orgs/community/discussions/26671#discussioncomment-3252793
-    name: Setup
+  do:
     runs-on: ubuntu-latest
-    outputs:
-      new_pkgver: ${{ steps.pkg.outputs.new_pkgver }}
-      new_pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -35,8 +32,8 @@ jobs:
       - name: Calculate pkgver and pkgrel
         id: pkg
         run: |
-          version_current=$(awk 'match($0, "^pkgver=([0-9]+)$", arr) {print arr[1]}' visual-studio-code-insiders-bin/PKGBUILD)
-          pkgrel_current=$(awk 'match($0, "^pkgrel=([0-9]+)$", arr) {print arr[1]}' visual-studio-code-insiders-bin/PKGBUILD)
+          version_current=$(awk 'match($0, "^pkgver=([0-9]+)$", arr) {print arr[1]}' ${{ env.PKGNAME }}/PKGBUILD)
+          pkgrel_current=$(awk 'match($0, "^pkgrel=([0-9]+)$", arr) {print arr[1]}' ${{ env.PKGNAME }}/PKGBUILD)
 
           if [ -z "${version_current}" ]; then
           echo "::error ::Could not find current version"
@@ -74,14 +71,40 @@ jobs:
           echo "::notice ::Version changed $version_current -> $version_new"
           echo "new_pkgver=$version_new" >> $GITHUB_OUTPUT
           echo "new_pkgrel=1" >> $GITHUB_OUTPUT
-  update-insiders:
-    name: Update package
-    if: needs.setup.outputs.new_pkgver != '' || needs.setup.outputs.new_pkgrel != ''
-    uses: ./.github/workflows/base.yml
-    needs: setup
-    secrets: inherit
-    with:
-      pkgname: visual-studio-code-insiders-bin
-      new-pkgver: ${{ needs.setup.outputs.new_pkgver }}
-      new-pkgrel: ${{ needs.setup.outputs.new_pkgrel }}
-      publish-to-aur: 'yes'
+      - name: Prepare commit message
+        uses: ./.github/actions/prepare-commit-msg
+        if: steps.pkg.outputs.new_pkgver != '' || steps.pkg.outputs.new_pkgrel != ''
+        id: prep
+        with:
+          pkgname: ${{ env.PKGNAME }}
+          new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
+          new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
+      - name: Update PKGBULD and generate diff
+        uses: ./.github/actions/updpkgsums
+        if: steps.prep.outcome == 'success'
+        id: update
+        with:
+          pkgname: ${{ env.PKGNAME }}
+          new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
+          new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
+          skip-makepkg: 'no'
+      - name: Apply diff
+        uses: ./.github/actions/apply-diff
+        if: steps.update.outcome == 'success'
+        id: diff
+        with:
+          diff-artifact-id: ${{ steps.update.outputs.diff-artifact-id }}
+      - name: Commit to Github and push
+        uses: ./.github/actions/commit
+        if: steps.diff.outcome == 'success'
+        id: commit
+        with:
+          commit-msg: ${{ steps.prep.outputs.commit-msg }}
+      - name: Push to AUR
+        uses: ./.github/actions/push
+        if: steps.commit.outcome == 'success'
+        with:
+          pkgname: ${{ env.PKGNAME }}
+          commit-msg: ${{ steps.prep.outputs.commit-msg }}
+          new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
+          new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}

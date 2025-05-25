@@ -26,3 +26,6 @@ cleanup.sh
 
 # IDE
 .idea/
+
+# nvchecker
+/versions_new.json

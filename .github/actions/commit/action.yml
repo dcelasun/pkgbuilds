@@ -1,0 +1,50 @@
+name: Commit and push to Github
+inputs:
+  commit-msg:
+    description: Commit message
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Validate inputs
+      shell: bash
+      run: |
+        if [ -z "${{ inputs.commit-msg }}" ]; then
+          echo "::error ::commit-msg is empty"
+          exit 1
+        fi
+    - name: Configure SSH and git
+      shell: bash
+      run: |
+        mkdir ~/.ssh
+        echo "${{ secrets.SSH_KEY_PRIVATE }}" > ~/.ssh/github_aur
+        echo "${{ secrets.SSH_KEY_PUBLIC }}" > ~/.ssh/github_aur.pub
+        ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+        cat >> ~/.ssh/config<< EOF
+        Host aur.archlinux.org
+            User aur
+            IdentityFile ~/.ssh/github_aur
+        EOF
+
+        chmod 700 ~/.ssh
+        chmod -R 600 ~/.ssh/*
+
+        eval $(ssh-agent -s)
+        ssh-add ~/.ssh/github_aur
+
+        ls -alh ~/.ssh
+        cat ~/.ssh/known_hosts
+        cat ~/.ssh/config
+
+        git config --global gpg.format ssh
+        git config --global user.signingkey ~/.ssh/github_aur.pub
+        git config --global commit.gpgsign true
+        git config --global user.email "${{ secrets.GIT_EMAIL }}"
+        git config --global user.name "${{ secrets.GIT_USER }}"
+    - name: Commit and push to Github
+      id: commit
+      shell: bash
+      run: |
+        git commit -am "${{ inputs.commit-msg }}"
+        git push
