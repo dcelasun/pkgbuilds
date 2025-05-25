@@ -34,7 +34,7 @@ jobs:
           sudo apt-get -y install yq # needed for tomlq
           docker exec "$(cat ${container_id})" nvchecker --failures -c /pkgbuilds/nvchecker.toml
           nvcmp_output=$(docker exec "$(cat ${container_id})" nvcmp -c /pkgbuilds/nvchecker.toml -j)
-          if [ -z "$nvcmp_output" ]; then
+          if [ -z "$nvcmp_output" ] || [ "$nvcmp_output" == '[]' ]; then
             echo "::notice ::No new versions found"
             exit 0
           fi
@@ -80,6 +80,7 @@ jobs:
   create-prs:
     name: Create PR for ${{ matrix.package }}
     needs: define-matrix
+    if: needs.define-matrix.outputs.packages != ''
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
