@@ -28,6 +28,7 @@ runs:
       run: |
         mkdir ~/.ssh
         echo "${{ inputs.ssh-priv-key }}" > ~/.ssh/github_aur
+        chmod 600 ~/.ssh/github_aur
         ssh-keygen -f ~/.ssh/github_aur -y > ~/.ssh/github_aur.pub
         ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
         cat >> ~/.ssh/config<< EOF
@@ -39,12 +40,12 @@ runs:
         chmod 700 ~/.ssh
         find ~/.ssh -type f -exec chmod 600 {} \;
 
-        eval $(ssh-agent -s)
-        ssh-add ~/.ssh/github_aur
-
         ls -alh ~/.ssh
         cat ~/.ssh/known_hosts
         cat ~/.ssh/config
+
+        eval $(ssh-agent -s)
+        ssh-add ~/.ssh/github_aur
 
         git config --global gpg.format ssh
         git config --global user.signingkey ~/.ssh/github_aur.pub

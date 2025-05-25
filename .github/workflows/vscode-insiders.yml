@@ -105,3 +105,6 @@ jobs:
           commit-msg: ${{ steps.prep.outputs.commit-msg }}
           new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
           new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
+          commit-email: ${{ secrets.GIT_EMAIL }}
+          commit-user: ${{ secrets.GIT_USER }}
+          ssh-priv-key: ${{ secrets.SSH_KEY_PRIVATE }}
