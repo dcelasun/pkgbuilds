@@ -1,0 +1,79 @@
+name: AUR
+'on':
+  workflow_dispatch:
+
+jobs:
+
+  AUR:
+    name: AUR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v3
+
+      - name: Pull base image.
+        run: docker pull quay.io/aminvakil/archlinux:latest
+
+      - name: Run a container of base image and mount package on it.
+        run: |
+          container_id=$(mktemp)
+          docker run --detach --privileged --cgroup-parent=docker.slice --cgroupns private --tmpfs /tmp --tmpfs /run --tmpfs /run/lock -v "${PWD}":/pkgbuilds quay.io/aminvakil/archlinux:latest > "${container_id}"
+          echo "container_id=$container_id" >> $GITHUB_ENV
+
+      - name: pacman -Syu
+        run: docker exec "$(cat ${container_id})" pacman -Syu --noconfirm
+
+      - name: Install nvchecker and git.
+        run: docker exec "$(cat ${container_id})" pacman -S nvchecker git pyalpm python-packaging python-jq --noconfirm
+
+      - name: Nvcheck!
+        run: |
+          docker exec "$(cat ${container_id})" nvchecker --failures -c /pkgbuilds/nvchecker.toml
+          aur_nvcmp_output=$(docker exec "$(cat ${container_id})" nvcmp -c /pkgbuilds/nvchecker.toml)
+          nvchecker_source=$(docker exec "$(cat ${container_id})" awk "/\[$(echo $aur_nvcmp_output | awk '{print $1}')\]/{getline; print}" /pkgbuilds/nvchecker.toml | awk '{print $3}' | tr -d '"')
+          nvchecker_repository=$(docker exec "$(cat ${container_id})" awk "/\[$(echo $aur_nvcmp_output | awk '{print $1}')\]/{getline; getline; print}" /pkgbuilds/nvchecker.toml | awk '{print $3}' | tr -d '"')
+          nvchecker_prefix=$(docker exec "$(cat ${container_id})" awk "/\[$(echo $aur_nvcmp_output | awk '{print $1}')\]/{getline; getline; getline; getline; print}" /pkgbuilds/nvchecker.toml | awk '{print $3}' | tr -d '"')
+          new_version=$(echo ${aur_nvcmp_output} | awk '{print $4}')
+          case "$nvchecker_source" in
+          ("github")
+          release_url="https://github.com/${nvchecker_repository}/releases/tag/${nvchecker_prefix}${new_version}"
+          ;;
+          (*)
+          release_url=None
+          ;;
+          esac
+          if [[ $aur_nvcmp_output ]]; then AUR_HAS_CHANGED='true' ; fi
+          echo "AUR_HAS_CHANGED=$AUR_HAS_CHANGED" >> $GITHUB_ENV
+          echo 'aur_nvcmp_output<<EOF' >> $GITHUB_ENV
+          echo $aur_nvcmp_output >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+          echo "release_url=${release_url}" >> $GITHUB_ENV
+          mv versions_new.json versions_old.json
+
+      # - name: Create AUR Issue.
+      #   id: aur-create-issue
+      #   if: env.AUR_HAS_CHANGED == 'true' && github.event_name != 'pull_request'
+      #   uses: JasonEtco/create-an-issue@v2
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     update_existing: true
+      #     filename: .github/AUR_ISSUE_TEMPLATE.md
+
+      - name: Create AUR Pull Request
+        if: env.AUR_HAS_CHANGED == 'true' && github.event_name != 'pull_request'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: ${{ env.aur_nvcmp_output }}
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: aurbump
+          delete-branch: true
+          title: 'AUR Bump'
+          body: ${{ env.release_url }}
+          draft: false
+
+      - name: Stop and remove container forcefully.
+        run: docker rm -f "$(cat ${container_id})"
