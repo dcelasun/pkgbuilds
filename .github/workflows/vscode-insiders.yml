@@ -99,8 +99,8 @@ jobs:
         id: commit
         with:
           commit-msg: ${{ steps.prep.outputs.commit-msg }}
-      - name: Push to AUR
-        uses: ./.github/actions/push-to-aur
+      - name: Publish to AUR
+        uses: ./.github/actions/publish-to-aur
         if: steps.commit.outcome == 'success'
         with:
           pkgname: ${{ env.PKGNAME }}

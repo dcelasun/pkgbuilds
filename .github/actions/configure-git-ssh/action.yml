@@ -1,4 +1,4 @@
-name: Configure git and SSH with signing supports
+name: Configure git and SSH with signing support
 inputs:
   ssh-priv-key:
     description: SSH private key
@@ -24,7 +24,7 @@ runs:
           echo "::error ::commit-user is empty"
           exit 1
         fi
-    - name: Configure SSH and git
+    - name: Configure git and SSH
       shell: bash
       run: |
         mkdir ~/.ssh

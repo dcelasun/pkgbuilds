@@ -1,4 +1,4 @@
-name: Update any package
+name: Update package
 run-name: Update ${{ inputs.pkgname }} to ${{ inputs.pkgver }}${{ inputs.pkgrel != '' && '-' || '' }}${{ inputs.pkgrel }}
 on:
   workflow_dispatch:
@@ -66,8 +66,8 @@ jobs:
         uses: ./.github/actions/commit-and-push
         with:
           commit-msg: ${{ steps.prep.outputs.commit-msg }}
-      - name: Push to AUR
-        uses: ./.github/actions/push-to-aur
+      - name: Publish to AUR
+        uses: ./.github/actions/publish-to-aur
         if: inputs.publish == 'yes'
         with:
           pkgname: ${{ env.PKGNAME }}

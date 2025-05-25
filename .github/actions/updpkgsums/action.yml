@@ -1,4 +1,4 @@
-name: updpkgsums and .SRCINFO
+name: updpkgsums and generate .SRCINFO
 inputs:
   pkgname:
     description: Package name
@@ -42,7 +42,7 @@ runs:
             exit 1
           fi
         fi
-    - name: "Update checksums & .SRCINFO"
+    - name: updpkgsums and generate .SRCINFO
       id: updpkgsums
       uses: dcelasun/archlinux-package-action@afb6c2a5c010e5e524b773b2d05ba31771761c65 # 25-May-2025
       with:

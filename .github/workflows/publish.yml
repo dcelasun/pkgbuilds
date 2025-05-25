@@ -42,7 +42,7 @@ jobs:
               return commit.message.match(isPackageCommit)[1];
             });
             return JSON.stringify(packages);
-  push:
+  publish:
     if: needs.pkgnames.outputs.pkgnames != '[]'
     needs: pkgnames
     strategy:
@@ -70,8 +70,8 @@ jobs:
           pkgname: ${{ matrix.pkgname }}
           new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
           new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
-      - name: Push to AUR
-        uses: ./.github/actions/push-to-aur
+      - name: Publish to AUR
+        uses: ./.github/actions/publish-to-aur
         with:
           pkgname: ${{ matrix.pkgname }}
           commit-msg: ${{ steps.prep.outputs.commit-msg }}
