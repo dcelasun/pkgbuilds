@@ -50,6 +50,7 @@ runs:
         updpkgsums: true
         srcinfo: true
         namcap: false
+        aur: true
         pkgver: '${{ inputs.new-pkgver }}'
         pkgrel: '${{ inputs.new-pkgrel }}'
         flags: ${{ inputs.skip-makepkg == 'no' && '-cfs --noconfirm' || '' }}
