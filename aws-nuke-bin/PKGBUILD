@@ -1,7 +1,7 @@
 # Maintainer: D. Can Celasun <can[at]dcc[dot]im>
 pkgname=aws-nuke-bin
 pkgdesc='Nuke a whole AWS account and delete all its resources.'
-pkgver=3.54.0
+pkgver=3.55.0
 pkgrel=1
 arch=('x86_64' 'aarch64' 'armv7h')
 url=https://github.com/ekristen/aws-nuke
