@@ -6,7 +6,7 @@
 
 pkgname=firefox-vaapi
 _pkgname=firefox
-pkgver=138.0.4
+pkgver=138.0
 pkgrel=1
 pkgdesc="Fast, Private & Safe Web Browser (with VA-API patches)"
 url="https://www.mozilla.org/firefox/"
