@@ -105,6 +105,8 @@ jobs:
           newver=$(echo '${{ needs.define-matrix.outputs.changes }}' | jq -r '.[] | select(.name=="${{ matrix.package }}").newver')
           url=$(echo '${{ needs.define-matrix.outputs.urls }}' | jq -r '."${{ matrix.package }}"')
           echo "pkgver=$newver" >> $GITHUB_OUTPUT
+          # pkgrel reset with new pkgver
+          echo "pkgrel=1" >> $GITHUB_OUTPUT
           echo "url=$url" >> $GITHUB_OUTPUT
       - name: Clone repository
         uses: actions/checkout@v4
@@ -126,6 +128,7 @@ jobs:
         with:
           pkgname: ${{ matrix.package }}
           new-pkgver: ${{ steps.identify.outputs.pkgver }}
+          new-pkgrel: ${{ steps.identify.outputs.pkgrel }}
           skip-ci: 'no'
       - name: Update PKGBUILD and generate diff
         uses: ./.github/actions/updpkgsums
@@ -133,6 +136,7 @@ jobs:
         with:
           pkgname: ${{ matrix.package }}
           new-pkgver: ${{ steps.identify.outputs.pkgver }}
+          new-pkgrel: ${{ steps.identify.outputs.pkgrel }}
           skip-makepkg: ${{ matrix.package == 'firefox-vaapi' && 'yes' || 'no' }}
       - name: Run nvtake
         run: |
