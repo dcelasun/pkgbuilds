@@ -18,9 +18,10 @@ jobs:
       pkgnames: ${{ steps.pkgnames.outputs.result }}
     steps:
       - name: Identify pkgnames
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: pkgnames
         with:
+          result-encoding: string
           script: |
             const isPackageCommit = /^\[([\w\-\d]+)\]/;
             const hasSkipCI = /(\[skip-ci\])/;
