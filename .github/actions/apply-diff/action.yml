@@ -27,3 +27,12 @@ runs:
         fi
         git apply diff.patch
         rm -f diff.patch
+    - name: Delete artifact
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.actions.deleteArtifact({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            artifact_id: ${{ inputs.diff-artifact-id }}
+          });
