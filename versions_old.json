@@ -22,9 +22,9 @@
       "version": "1.2.3"
     },
     "cloudquery-cli": {
-      "version": "6.15.5",
-      "gitref": "refs/tags/cli-v6.15.5",
-      "url": "https://github.com/cloudquery/cloudquery/releases/tag/cli-v6.15.5"
+      "version": "6.20.2",
+      "gitref": "refs/tags/cli-v6.20.2",
+      "url": "https://github.com/cloudquery/cloudquery/releases/tag/cli-v6.20.2"
     },
     "commafeed": {
       "version": "5.9.0",
