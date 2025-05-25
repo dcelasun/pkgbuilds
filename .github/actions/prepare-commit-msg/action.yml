@@ -9,6 +9,9 @@ inputs:
   new-pkgrel:
     description: New pkgrel
     required: false
+  skip-ci:
+    description: "Add [skip-ci] to the commit message"
+    default: 'yes'
 
 outputs:
   commit-msg:
@@ -50,7 +53,10 @@ runs:
         if [ -z "${{ inputs.new-pkgver }}" ]; then
           msg="Bump pkgrel to ${{ inputs.new-pkgrel }}"
         fi
-        msg="$(printf "[$pkgname] ${msg}\n\n[skip ci]")"
+        msg="$(printf "[$pkgname] ${msg}")"
+        if [ "${{ inputs.skip-ci }}" != 'no' ]; then
+          msg="$(printf "$msg\n\n[skip ci]")"
+        fi
 
         # This ugliness is necessary to escape square brackets within the message
         # See comments of https://stackoverflow.com/a/74232400/879047

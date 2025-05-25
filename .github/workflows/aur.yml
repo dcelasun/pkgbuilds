@@ -126,6 +126,7 @@ jobs:
         with:
           pkgname: ${{ matrix.package }}
           new-pkgver: ${{ steps.identify.outputs.pkgver }}
+          skip-ci: 'no'
       - name: Update PKGBUILD and generate diff
         uses: ./.github/actions/updpkgsums
         id: update
