@@ -44,7 +44,7 @@ runs:
         fi
     - name: "Update checksums & .SRCINFO"
       id: updpkgsums
-      uses: dcelasun/archlinux-package-action@93e6ac984d1c521bd5d2f36b604c0b863f7f520e # 25-May-2025
+      uses: dcelasun/archlinux-package-action@0c8508726937a24dc43c01cac5c7c15a09cdc2eb # 25-May-2025
       with:
         path: ${{ inputs.pkgname }}
         updpkgsums: true
