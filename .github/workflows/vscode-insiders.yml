@@ -37,21 +37,28 @@ jobs:
           exit 1
           fi
 
-          version_x86=$(IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-x64/insider); echo "${ADDR[7]}" | sed 's/code-insider-x64-//g' | sed 's/.tar.gz//g' | sed 's/-/./g')
-          version_a64=$(IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-arm64/insider); echo "${ADDR[7]}" | sed 's/code-insider-arm64-//g' | sed 's/.tar.gz//g' | sed 's/-/./g')
-          version_a7h=$(IFS='/' read -ra ADDR <<< $(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-armhf/insider); echo "${ADDR[7]}" | sed 's/code-insider-armhf-//g' | sed 's/.tar.gz//g' | sed 's/-/./g')
-
           version_new=""
-          if [ -n "${version_x86}" ]; then
-          version_new=$version_x86
-          elif [ -n "${version_a64}" ]; then
-          version_new=$version_a64
-          elif [ -n "${version_a7h}" ]; then
-          version_new=$version_a7h
-          fi
+          lookup=("x64:x86_64" "arm64:aarch64" "armhf:armv7h")
+          for entry in "${lookup[@]}"; do
+            arch1=${entry%%:*}
+            arch2=${entry#*:}
+
+            url=$(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-${arch1}/insider)
+            version=$(IFS='/' read -ra ADDR <<< $(echo "${url}"); echo "${ADDR[7]}" | sed "s/code-insider-${arch1}-//g" | sed 's/.tar.gz//g' | sed 's/-/./g')
+            if [ -z "$version" ]; then
+              echo "::error ::No version found from ${url}"
+              continue
+            fi
+
+            if [ "${arch1}" == 'x64' ]; then
+              version_new=$version
+            fi
+
+            sed -i "s|^source_${arch2}=.*$|source_${arch2}=\(code_${arch1}_${version}\.tar\.gz::${url}\)|g" ${{ env.PKGNAME }}/PKGBUILD
+          done
 
           if [ -z "${version_new}" ]; then
-          echo "::error ::Could not find new version for any arch"
+          echo "::error ::Could not find new version"
           exit 1
           fi
 
