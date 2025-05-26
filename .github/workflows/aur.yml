@@ -37,11 +37,12 @@ jobs:
           docker exec "$(cat ${container_id})" pacman -Syu --noconfirm
           docker exec "$(cat ${container_id})" pacman -S nvchecker git pyalpm python-packaging python-jq --noconfirm
           echo "container_id=$container_id" >> $GITHUB_ENV
+      - name: Install yq
+        run: |
+          sudo apt-get -y install yq # needed for tomlq
       - name: Run nvchecker
         id: nvcheck
         run: |
-          sudo apt-get -y install yq # needed for tomlq
-
           nvcmp_output=''
           for file in nvchecker{,_flaky}.toml; do
             failures='--failures'
