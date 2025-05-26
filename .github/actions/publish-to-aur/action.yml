@@ -44,7 +44,7 @@ runs:
 
         if [ ! -z "${{ inputs.new-pkgver }}" ]; then
           valid=$(printf "${{ inputs.new-pkgver }}" | awk 'match($0, "^([a-zA-Z0-9_.]+)$", arr) {print arr[1]}')
-          if [ -z "$valid" ]]; then
+          if [ -z "$valid" ]; then
             echo "::error ::pkgver can only contain letters, numbers, dots and underscores"
             exit 1
           fi
