@@ -1,5 +1,5 @@
 [__config__]
-oldver = "versions_old.json"
+oldver = "versions.json"
 newver = "versions_new.json"
 
 [amazon-ecr-credential-helper]
