@@ -181,8 +181,8 @@ jobs:
           commit-email: ${{ secrets.GIT_EMAIL }}
           commit-user: ${{ secrets.GIT_USER }}
       - name: Create PR
-        if: github.event_name != 'pull_request'
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        id: pr
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: ${{ steps.prep.outputs.commit-msg }}
@@ -194,6 +194,14 @@ jobs:
           delete-branch: true
           signoff: false
           draft: false
+      - name: Warn if makepkg was skipped
+        if: steps.prep.outputs.built == 'no'
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
+        with:
+          pr-number: ${{ steps.pr.outputs.pull-request-number }}
+          message: |
+            :rotating_light: **WARNING** :rotating_light:
+            `makepkg` was not executed. Verify package locally before merging!
       - name: Stop nvchecker
         run: |
           docker rm -f "$(cat ${container_id})"

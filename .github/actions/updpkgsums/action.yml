@@ -15,6 +15,10 @@ inputs:
       Useful for large packages that can't be built on Github, like firefox-vaapi.
     default: 'no'
 
+outputs:
+  built:
+    description: Whether package was successfully built
+    value: ${{ inputs.skip-makepkg == 'no' && 'yes' || 'no' }}
 runs:
   using: "composite"
   steps:
