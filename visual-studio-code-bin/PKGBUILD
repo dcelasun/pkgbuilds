@@ -40,23 +40,11 @@ sha256sums_armv7h=('4510b4e2b0adc8cfa3fb06e26a102216a350cae0a98eba15ef5a22a40fb5
 
 _set_meta_info() {
   sed 's/@@NAME_LONG@@/Visual Studio Code/g' "$1" |\
-    sed 's/@@NAME_SHORT@@/Code/g' |\
-    sed 's/@@NAME@@/code/g' |\
-    sed 's#@@EXEC@@#/usr/bin/code#g' |\
-    sed 's/@@ICON@@/visual-studio-code/g' |\
-    sed 's/@@URLPROTOCOL@@/vscode/g'
-}
-
-_pkg() {
-  if [ "${CARCH}" = "aarch64" ]; then
-    echo 'VSCode-linux-arm64'
-  elif [ "${CARCH}" = "armv7h" ]; then
-    echo 'VSCode-linux-armhf'
-  elif [ "${CARCH}" = "i686" ]; then
-    echo 'VSCode-linux-ia32'
-  else
-    echo 'VSCode-linux-x64'
-  fi
+  sed 's/@@NAME_SHORT@@/Code/g' |\
+  sed 's/@@NAME@@/code/g' |\
+  sed 's#@@EXEC@@#/usr/bin/code#g' |\
+  sed 's/@@ICON@@/visual-studio-code/g' |\
+  sed 's/@@URLPROTOCOL@@/vscode/g'
 }
 
 prepare() {
@@ -65,18 +53,17 @@ prepare() {
   _set_meta_info "${srcdir}/code-${pkgver}-workspace.xml.in" > "${srcdir}/code-workspace.xml"
 }
 
-package() {
-  _pkg=VSCode-linux-x64
+_pkg() {
   if [ "${CARCH}" = "aarch64" ]; then
-    _pkg=VSCode-linux-arm64
+    echo 'VSCode-linux-arm64'
+  elif [ "${CARCH}" = "armv7h" ]; then
+    echo 'VSCode-linux-armhf'
+  else
+    echo 'VSCode-linux-x64'
   fi
-  if [ "${CARCH}" = "armv7h" ]; then
-    _pkg=VSCode-linux-armhf
-  fi
-  if [ "${CARCH}" = "i686" ]; then
-    _pkg=VSCode-linux-ia32
-  fi
+}
 
+package() {
   install -d "${pkgdir}/opt/${_pkgname}"
   install -d "${pkgdir}/usr/bin"
   install -d "${pkgdir}/usr/share/"{applications,pixmaps,mime/packages,licenses/${_pkgname}}
@@ -94,4 +81,3 @@ package() {
   # Launcher
 	install -m755 "${srcdir}/${_pkgname}-bin.sh" "${pkgdir}/usr/bin/code"
 }
-
