@@ -41,12 +41,28 @@ jobs:
         id: nvcheck
         run: |
           sudo apt-get -y install yq # needed for tomlq
-          docker exec "$(cat ${container_id})" nvchecker --failures -k /pkgbuilds/keyfile.toml -c /pkgbuilds/nvchecker.toml
+
+          nvcmp_output=''
+          for file in nvchecker{,_flaky}.toml; do
+            failures='--failures'
+            if [ "$file" == 'nvchecker_flaky.toml' ]; then
+              failures=''
+            fi
+
+            docker exec "$(cat ${container_id})" nvchecker ${failures} -k /pkgbuilds/keyfile.toml -c /pkgbuilds/${file}
+            out=$(docker exec "$(cat ${container_id})" nvcmp -c /pkgbuilds/${file} -j)
+            if [ -z "$out" ] || [ "$out" == '[]' ]; then
+              echo "::notice ::No new versions found in ${file}"
+            fi
+            nvcmp_output+=$out
+          done
+
+          # Merge outputs from the loop
+          nvcmp_output=$(echo "$nvcmp_output" | jq -cs 'add')
+
           rm -f keyfile.toml # Only needed for the nvchecker command
-          nvcmp_output=$(docker exec "$(cat ${container_id})" nvcmp -c /pkgbuilds/nvchecker.toml -j)
           if [ -z "$nvcmp_output" ] || [ "$nvcmp_output" == '[]' ]; then
-            echo "::notice ::No new versions found"
-            exit 0
+              echo "::notice ::No new versions found"
           fi
 
           pkgs=$(echo "$nvcmp_output" | jq -c '[.[].name]')
@@ -59,28 +75,41 @@ jobs:
           urls=''
           pkgs=$(echo "$nvcmp_output" | jq -c '[.[].name]')
           while read -r pkg; do
-          version=$(echo "$nvcmp_output" | jq -r '.[] | select(.name=="'${pkg}'").newver')
-          expr=$(printf '."%s"' "$pkg")
-          src=$(tomlq -r ${expr}.source nvchecker.toml)
-
-          url=''
-          if [ "${src}" == "github" ]; then
-            repo=$(tomlq -r ${expr}.github nvchecker.toml)
-            pfx=$(tomlq -r ${expr}.prefix nvchecker.toml)
-            url=$(printf "https://github.com/${repo}/releases/tag/${pfx}${version}")
-          else
-            url=$(tomlq -r ${expr}.release_url nvchecker.toml)
-            if [ -z "$url" ]; then
-              url=$(tomlq -r ${expr}.url nvchecker.toml)
+            version=$(echo "$nvcmp_output" | jq -r '.[] | select(.name=="'${pkg}'").newver')
+            expr=$(printf '."%s"' "$pkg")
+            src=$(tomlq -r ${expr}.source nvchecker.toml)
+            if [ -z "$src" ]; then
+              src=$(tomlq -r ${expr}.source nvchecker_flaky.toml)
             fi
-            url=$(echo "$url" | sed 's/__version__/'${version}'/g')
-          fi
 
-          if [ -z "$url" ]; then
-            url='None'
-          fi
+            url=''
+            if [ "${src}" == "github" ]; then
+              repo=$(tomlq -r ${expr}.github nvchecker.toml)
+              pfx=$(tomlq -r ${expr}.prefix nvchecker.toml)
+              if [ -z "$repo" ]; then
+                repo=$(tomlq -r ${expr}.github nvchecker_flaky.toml)
+                pfx=$(tomlq -r ${expr}.prefix nvchecker_flaky.toml)
+              fi
+              url=$(printf "https://github.com/${repo}/releases/tag/${pfx}${version}")
+            else
+              url=$(tomlq -r ${expr}.release_url nvchecker.toml)
+              if [ -z "$url" ]; then
+                url=$(tomlq -r ${expr}.url nvchecker.toml)
+              fi
+              if [ -z "$url" ]; then
+                url=$(tomlq -r ${expr}.release_url nvchecker_flaky.toml)
+              fi
+              if [ -z "$url" ]; then
+                url=$(tomlq -r ${expr}.url nvchecker_flaky.toml)
+              fi
+              url=$(echo "$url" | sed 's/__version__/'${version}'/g')
+            fi
 
-          urls+=$(echo "${pkg}=${url}" | jq -R './"=" | {key:first,value:last}')
+            if [ -z "$url" ]; then
+              url='None'
+            fi
+
+            urls+=$(echo "${pkg}=${url}" | jq -R './"=" | {key:first,value:last}')
           done <<< "$(echo $pkgs | jq -r '.[]')"
 
           urls=$(echo "$urls" | jq -cs 'from_entries')
@@ -92,7 +121,7 @@ jobs:
   create-prs:
     name: Create PR for ${{ matrix.package }}
     needs: define-matrix
-    if: needs.define-matrix.outputs.packages != ''
+    if: needs.define-matrix.outputs.packages != '[]'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -140,6 +169,8 @@ jobs:
           skip-makepkg: ${{ matrix.package == 'firefox-vaapi' && 'yes' || 'no' }}
       - name: Run nvtake
         run: |
+          # Only the [__config__] block matters for nvtake,
+          # so we don't care if the package is in nvchecker_flaky.toml
           docker exec "$(cat ${container_id})" nvtake -c /pkgbuilds/nvchecker.toml ${{ matrix.package }}
       - name: Configure git and SSH
         uses: ./.github/actions/configure-git-ssh
