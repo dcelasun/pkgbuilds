@@ -1,6 +1,6 @@
 [__config__]
-oldver = "versions.json"
-newver = "versions_new.json"
+oldver = "versions_flaky.json"
+newver = "versions_flaky_new.json"
 
 [snowflake-client]
 source = "regex"

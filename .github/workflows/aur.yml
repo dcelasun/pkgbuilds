@@ -174,8 +174,6 @@ jobs:
           skip-makepkg: ${{ matrix.package == 'firefox-vaapi' && 'yes' || 'no' }}
       - name: Run nvtake
         run: |
-          # Only the [__config__] block matters for nvtake,
-          # so we don't care if the package is in nvchecker_flaky.toml
           docker exec "$(cat ${container_id})" nvtake -c /pkgbuilds/nvchecker.toml ${{ matrix.package }}
       - name: Configure git and SSH
         uses: ./.github/actions/configure-git-ssh

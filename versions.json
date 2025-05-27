@@ -83,12 +83,6 @@
     "paradox-launcher": {
       "version": "2025.6"
     },
-    "snowflake-client": {
-      "version": "1.4.0"
-    },
-    "snowflake-odbc": {
-      "version": "3.8.0"
-    },
     "unigine-tropics": {
       "version": "1.3"
     },
