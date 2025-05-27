@@ -48,7 +48,7 @@ runs:
         fi
     - name: updpkgsums and generate .SRCINFO
       id: updpkgsums
-      uses: dcelasun/archlinux-package-action@afb6c2a5c010e5e524b773b2d05ba31771761c65 # 25-May-2025
+      uses: heyhusen/archlinux-package-action@5b75404b8d9faaf06062f98a4b94ba4b0774c0d5 # v2.3.0
       with:
         path: ${{ inputs.pkgname }}
         updpkgsums: true
