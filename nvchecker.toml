@@ -37,7 +37,6 @@ prefix = "cli-v"
 source = "github"
 github = "Athou/commafeed"
 use_max_tag = true
-prefix = "v"
 
 [downlords-faf-client]
 source = "github"
