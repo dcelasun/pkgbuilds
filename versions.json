@@ -27,10 +27,10 @@
       "url": "https://github.com/cloudquery/cloudquery/releases/tag/cli-v6.20.4"
     },
     "commafeed": {
-      "version": "5.9.0",
-      "gitref": "refs/tags/5.9.0",
-      "revision": "fad0aea1088f15a9b5a5c382e65c55d52f456706",
-      "url": "https://github.com/Athou/commafeed/releases/tag/5.9.0"
+      "version": "5.10.0",
+      "gitref": "refs/tags/5.10.0",
+      "revision": "f361be0c72e965be936b7796ad8b2bb02665208a",
+      "url": "https://github.com/Athou/commafeed/releases/tag/5.10.0"
     },
     "downlords-faf-client": {
       "version": "2025.5.0",
