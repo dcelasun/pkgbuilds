@@ -18,6 +18,7 @@ jobs:
       changes: ${{ steps.nvcheck.outputs.changes }}
       urls: ${{ steps.nvcheck.outputs.urls }}
       new-versions: ${{ steps.nvcheck.outputs.new_versions }}
+      new-versions-flaky: ${{ steps.nvcheck.outputs.new_versions_flaky }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -75,6 +76,8 @@ jobs:
           echo "changes=$nvcmp_output" >> $GITHUB_OUTPUT
           new_versions=$(cat versions_new.json | jq -c)
           echo "new_versions=$new_versions" >> $GITHUB_OUTPUT
+          new_versions_flaky=$(cat versions_flaky_new.json | jq -c)
+          echo "new_versions_flaky=$new_versions_flaky" >> $GITHUB_OUTPUT
 
           # Calculate release URLs
           urls=''
@@ -133,6 +136,9 @@ jobs:
       matrix:
         package: ${{ fromJSON(needs.define-matrix.outputs.packages) }}
     steps:
+      - name: Install yq
+        run: |
+          sudo apt-get -y install yq # needed for tomlq
       - name: Identify version and release URL
         id: identify
         run: |
@@ -150,6 +156,7 @@ jobs:
       - name: Prepare nvchecker
         run: |
           echo '${{ needs.define-matrix.outputs.new-versions }}' > versions_new.json
+          echo '${{ needs.define-matrix.outputs.new-versions-flaky }}' > versions_flaky_new.json
 
           container_id=$(mktemp)
           docker run --detach --privileged --cgroup-parent=docker.slice --cgroupns private --tmpfs /tmp --tmpfs /run --tmpfs /run/lock -v "${PWD}":/pkgbuilds quay.io/aminvakil/archlinux:latest > "${container_id}"
@@ -174,7 +181,11 @@ jobs:
           skip-makepkg: ${{ matrix.package == 'firefox-vaapi' && 'yes' || 'no' }}
       - name: Run nvtake
         run: |
-          docker exec "$(cat ${container_id})" nvtake -c /pkgbuilds/nvchecker.toml ${{ matrix.package }}
+          if [ $(tomlq -cr '."${{ matrix.package }}"' nvchecker.toml) != 'null' ]; then
+            docker exec "$(cat ${container_id})" nvtake -c /pkgbuilds/nvchecker.toml ${{ matrix.package }}
+          else
+            docker exec "$(cat ${container_id})" nvtake -c /pkgbuilds/nvchecker_flaky.toml ${{ matrix.package }}
+          fi
       - name: Configure git and SSH
         uses: ./.github/actions/configure-git-ssh
         id: configure
