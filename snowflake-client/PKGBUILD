@@ -15,7 +15,7 @@ pkgdesc="Snowflake Database command line client (snowsql)"
 arch=('x86_64')
 url="http://www.snowflake.net/"
 license=('custom:commercial')
-depends=('gcc-libs'
+depends=('gcc-libs' 'unzip'
          # Needed for libcrypt.so.1
          'libxcrypt-compat')
 source=(
