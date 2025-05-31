@@ -3,7 +3,7 @@ run-name: Publish latest ${{ inputs.pkgname }} to AUR
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
     inputs:
       pkgname:
