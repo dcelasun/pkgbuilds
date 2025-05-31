@@ -2,7 +2,7 @@
   "version": 2,
   "data": {
     "snowflake-client": {
-      "version": "1.4.0"
+      "version": "1.4.1"
     },
     "snowflake-odbc": {
       "version": "3.8.0"
