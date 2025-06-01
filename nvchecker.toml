@@ -110,6 +110,12 @@ regex = 'paradox-launcher-installer-([\d_]+)\.deb'
 from_pattern = '_'
 to_pattern = '.'
 
+[prometheus-transmission-exporter-git]
+source = "git"
+git = "https://github.com/metalmatze/transmission-exporter"
+release_url = "https://github.com/metalmatze/transmission-exporter/commit/__version__"
+use_commit = true
+
 [unigine-tropics]
 source = "regex"
 url = "https://benchmark.unigine.com/tropics"
