@@ -1,0 +1,18 @@
+pkgbase = prometheus-transmission-exporter-git
+	pkgdesc = Prometheus exporter for Transmission metrics
+	pkgver = 0.3.0.r15.ga7872aa
+	pkgrel = 1
+	url = https://github.com/metalmatze/transmission-exporter
+	arch = x86_64
+	arch = aarch64
+	license = MIT
+	makedepends = go>=1.21
+	options = !lto
+	source = git+https://github.com/metalmatze/transmission-exporter.git
+	source = prometheus-transmission-exporter.service
+	source = prometheus-transmission-exporter.conf
+	b2sums = SKIP
+	b2sums = a9e6a6f0d6f42e9e0064a27734f5b85140797a11cde310e4b87f91e764fd291cbb00ec0971bc4178761db6906792c6bf924752cef9835b095ab5694b6c37f565
+	b2sums = 7043095952720077502e4dab9c396086f24a976b272c08faf53f908169ca859e26dfc6eeb3d0fcbe538637d16a405d86e46c7ef71fca89cf25d41d54b15e9b6f
+
+pkgname = prometheus-transmission-exporter-git
