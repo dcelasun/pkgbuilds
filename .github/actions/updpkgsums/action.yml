@@ -50,6 +50,10 @@ runs:
       id: pgp
       shell: bash
       run: |
+        if ! grep -q validpgpkeys "${{ inputs.pkgname }}/.SRCINFO"; then
+          exit 0
+        fi
+
         key=$(grep 'validpgpkeys' "${{ inputs.pkgname }}/.SRCINFO" | awk -F ' ' '{print $3}')
         if [ ! -z "$key" ]; then
           echo "key=$key" >> $GITHUB_OUTPUT
