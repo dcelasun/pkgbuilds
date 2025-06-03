@@ -2,10 +2,10 @@
   "version": 2,
   "data": {
     "amazon-ecr-credential-helper": {
-      "version": "0.9.1",
-      "gitref": "refs/tags/v0.9.1",
-      "revision": "6540026091fe97d68c5e653b754cac6a3f5937ee",
-      "url": "https://github.com/awslabs/amazon-ecr-credential-helper/releases/tag/v0.9.1"
+      "version": "0.10.0",
+      "gitref": "refs/tags/v0.10.0",
+      "revision": "79ad5557681c631ff7f9391a561609a8452f81c1",
+      "url": "https://github.com/awslabs/amazon-ecr-credential-helper/releases/tag/v0.10.0"
     },
     "aranet4": {
       "version": "0.11.1",
