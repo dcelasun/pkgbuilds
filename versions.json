@@ -87,6 +87,9 @@
       "version": "a7872aa2975c7a95af680c51198f4a363e226c8f",
       "revision": "a7872aa2975c7a95af680c51198f4a363e226c8f"
     },
+    "transmission-cli-beta": {
+      "version": "4.1.0beta.2+rac5c9e082d"
+    },
     "unigine-tropics": {
       "version": "1.3"
     },
