@@ -4,7 +4,7 @@
 
 pkgname=intellij-idea-ultimate-edition
 pkgver=2025.1.2
-pkgrel=1
+pkgrel=2
 jbr_ver=21.0.6
 jbr_build=aarch64-b895
 jbr_minor=109
@@ -19,7 +19,7 @@ source=("jetbrains-idea.desktop")
 source_x86_64=("https://download.jetbrains.com/idea/ideaIU-$pkgver.tar.gz")
 source_aarch64=("https://download.jetbrains.com/idea/ideaIU-$pkgver-aarch64.tar.gz"
                 "https://cache-redirector.jetbrains.com/intellij-jbr/jbr-$jbr_ver-linux-$jbr_build.$jbr_minor.tar.gz"
-                 "https://github.com/JetBrains/intellij-community/raw/master/bin/linux/aarch64/fsnotifier")
+                 "fsnotifier-${pkgver}::https://github.com/JetBrains/intellij-community/raw/master/bin/linux/aarch64/fsnotifier")
 sha256sums=('83af2ba8f9f14275a6684e79d6d4bd9b48cd852c047dacfc81324588fa2ff92b')
 sha256sums_x86_64=('1e675bda1314ae914b64b31a22309ba2eba6f35e6659e53d4b291e73c2fb856b')
 sha256sums_aarch64=('0f982a4f4424bde5a33206c20df053a7afe174fe9d590943665504814a273c9d'
@@ -35,7 +35,7 @@ prepare() {
   # https://youtrack.jetbrains.com/articles/IDEA-A-48/JetBrains-IDEs-on-AArch64#linux
   if [ "${CARCH}" == "aarch64" ]; then
     cp -a "$srcdir"/jbr-${jbr_ver}-linux-${jbr_build}.${jbr_minor} "$srcdir"/jbr
-    cp -f fsnotifier "$srcdir"/idea-IU-*/bin/fsnotifier
+    cp -f fsnotifier-${pkgver} "$srcdir"/idea-IU-*/bin/fsnotifier
     chmod +x "$srcdir"/idea-IU-*/bin/fsnotifier
     rm -rf "$srcdir"/idea-IU-*/jbr
   else
