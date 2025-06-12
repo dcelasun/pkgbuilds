@@ -143,8 +143,7 @@ regex = 'client_drivers\/[\d.x]+/[\d.-]+\/vertica-client-([\d.]+)(?:[\d-]+)\.x86
 [visual-studio-code-bin]
 source = "github"
 github = "microsoft/vscode"
-use_max_release = true
-prefix = "v"
+use_latest_tag = true
 
 [writerscafe]
 source = "regex"
