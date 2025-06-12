@@ -97,6 +97,9 @@ jobs:
               if [ -z "$repo" ]; then
                 repo=$(tomlq -r ${expr}.github nvchecker_flaky.toml)
                 pfx=$(tomlq -r ${expr}.prefix nvchecker_flaky.toml)
+                if [ "${pfx}" == "null" ]; then
+                  pfx=""
+                fi
               fi
               url=$(printf "https://github.com/${repo}/releases/tag/${pfx}${version}")
             else
