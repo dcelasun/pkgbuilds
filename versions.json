@@ -71,6 +71,12 @@
       "revision": "28dc167a7824cd876a4cf3ce6f1bdaa1dda7c9c2",
       "url": "https://github.com/segmentio/ksuid/releases/tag/v1.0.4"
     },
+    "mullvad-socks5-proxy": {
+      "version": "0.0.1",
+      "gitref": "refs/tags/v0.0.1",
+      "revision": "ce69522897dbbff2b389d7c57a00b611117c0cf3",
+      "url": "https://github.com/dcelasun/mullvad-socks5-proxy/releases/tag/v0.0.1"
+    },
     "nut-monitor": {
       "version": "2.8.3"
     },

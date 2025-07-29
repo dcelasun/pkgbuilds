@@ -89,6 +89,12 @@ github = "segmentio/ksuid"
 use_max_tag = true
 prefix = "v"
 
+[mullvad-socks5-proxy]
+source = "github"
+github = "dcelasun/mullvad-socks5-proxy"
+use_max_tag = true
+prefix = "v"
+
 [nut-monitor]
 source = "regex"
 url = "https://networkupstools.org/download.html"
