@@ -95,11 +95,6 @@ github = "dcelasun/mullvad-socks5-proxy"
 use_max_tag = true
 prefix = "v"
 
-[nut-monitor]
-source = "regex"
-url = "https://networkupstools.org/download.html"
-regex = 'source\/[\d.]+\/nut-([\d.]+)\.tar\.gz'
-
 [owntracks-frontend]
 source = "github"
 github = "owntracks/frontend"

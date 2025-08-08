@@ -77,9 +77,6 @@
       "revision": "ce69522897dbbff2b389d7c57a00b611117c0cf3",
       "url": "https://github.com/dcelasun/mullvad-socks5-proxy/releases/tag/v0.0.1"
     },
-    "nut-monitor": {
-      "version": "2.8.3"
-    },
     "owntracks-frontend": {
       "version": "2.15.3",
       "gitref": "refs/tags/v2.15.3",
