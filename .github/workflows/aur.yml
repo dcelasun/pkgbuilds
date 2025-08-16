@@ -146,7 +146,6 @@ jobs:
         id: identify
         run: |
           newver=$(echo '${{ needs.define-matrix.outputs.changes }}' | jq -r '.[] | select(.name=="${{ matrix.package }}").newver')
-          newver=$(echo $newver | sed 's/-/_/g')
           url=$(echo '${{ needs.define-matrix.outputs.urls }}' | jq -r '."${{ matrix.package }}"')
           echo "pkgver=$newver" >> $GITHUB_OUTPUT
           # pkgrel reset with new pkgver
