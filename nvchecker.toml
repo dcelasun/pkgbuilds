@@ -44,6 +44,7 @@ source = "github"
 github = "FAForever/downlords-faf-client"
 use_max_tag = true
 prefix = "v"
+include_regex = '^v[\d]+\.[\d]+\.[\d]+$'
 
 [firefox-vaapi]
 source = "jq"
