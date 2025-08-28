@@ -21,11 +21,6 @@
     "basemark": {
       "version": "1.2.3"
     },
-    "cloudquery-cli": {
-      "version": "6.27.1",
-      "gitref": "refs/tags/cli-v6.27.1",
-      "url": "https://github.com/cloudquery/cloudquery/releases/tag/cli-v6.27.1"
-    },
     "commafeed": {
       "version": "5.11.0",
       "gitref": "refs/tags/5.11.0",

@@ -2,6 +2,13 @@
 oldver = "versions_flaky.json"
 newver = "versions_flaky_new.json"
 
+[cloudquery-cli]
+source = "github"
+github = "cloudquery/cloudquery"
+use_max_release = true
+include_regex = '^cli-v[\d.]+$'
+prefix = "cli-v"
+
 [snowflake-client]
 source = "regex"
 url = "https://www.snowflake.com/en/developers/downloads/snowsql/"

@@ -27,14 +27,6 @@ url = "https://www.gpuscore.com/benchmarks/basemark-gpu/"
 encoding = "utf-8"
 regex = 'BasemarkGPU-linux-x64-([\d.]+)\.tar\.gz'
 
-[cloudquery-cli]
-source = "github"
-github = "cloudquery/cloudquery"
-use_max_release = true
-include_regex = '^cli-v[\d.]+$'
-prefix = "cli-v"
-max_page = 10
-
 [commafeed]
 source = "github"
 github = "Athou/commafeed"
