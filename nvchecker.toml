@@ -33,6 +33,7 @@ github = "cloudquery/cloudquery"
 use_max_release = true
 include_regex = '^cli-v[\d.]+$'
 prefix = "cli-v"
+max_page = 10
 
 [commafeed]
 source = "github"
