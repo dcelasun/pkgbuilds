@@ -15,7 +15,8 @@ jobs:
   pkgnames:
     runs-on: ubuntu-latest
     outputs:
-      pkgnames: ${{ steps.pkgnames.outputs.result }}
+      pkgnames: ${{ steps.pkgnames.outputs.pkgnames }}
+      pkgdata: ${{ steps.pkgnames.outputs.pkgdata }}
     steps:
       - name: Identify pkgnames
         uses: actions/github-script@v7
@@ -24,7 +25,6 @@ jobs:
           PKGNAME: ${{ inputs.pkgname }}
           COMMITS: ${{ toJSON(github.event.commits) }}
         with:
-          result-encoding: string
           script: |
             const isPackageCommit = /^\[([\w\-\d]+)\]/;
             const hasSkipCI = /(\[skip-ci\])/;
@@ -32,16 +32,28 @@ jobs:
             const commits = JSON.parse(process.env.COMMITS);
             if ( commits === null || commits.length == 0) {
               if ( process.env.PKGNAME !== null && process.env.PKGNAME.length > 0 ) {
-                return JSON.stringify([process.env.PKGNAME]);
+                core.setOutput('pkgnames', JSON.stringify([process.env.PKGNAME]));
+                core.setOutput('pkgdata', JSON.stringify({}));
+                return;
               }
-              return '[]';
+              core.setOutput('pkgnames', '[]');
+              core.setOutput('pkgdata', JSON.stringify({}));
+              return;
             }
-            const packages = commits.filter(function (commit) {
+
+            const packages = [];
+            const pkgdata = {};
+
+            commits.filter(function (commit) {
               return isPackageCommit.test(commit.message) && !hasSkipCI.test(commit.message);
-            }).map(function (commit) {
-              return commit.message.match(isPackageCommit)[1];
+            }).forEach(function (commit) {
+              const pkgname = commit.message.match(isPackageCommit)[1];
+              packages.push(pkgname);
+              pkgdata[pkgname] = commit.message;
             });
-            return JSON.stringify(packages);
+
+            core.setOutput('pkgnames', JSON.stringify(packages));
+            core.setOutput('pkgdata', JSON.stringify(pkgdata));
   publish:
     if: needs.pkgnames.outputs.pkgnames != '[]'
     needs: pkgnames
@@ -70,11 +82,24 @@ jobs:
           pkgname: ${{ matrix.pkgname }}
           new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
           new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
+      - name: Select commit message
+        id: commitmsg
+        env:
+          PKGDATA: ${{ needs.pkgnames.outputs.pkgdata }}
+          PKGNAME: ${{ matrix.pkgname }}
+          PREPARED_MSG: ${{ steps.prep.outputs.commit-msg }}
+        run: |
+          ORIGINAL_MSG=$(echo "$PKGDATA" | jq -r --arg pkg "$PKGNAME" '.[$pkg] // ""')
+          if [ -n "$ORIGINAL_MSG" ]; then
+            echo "commit-msg=$ORIGINAL_MSG" >> $GITHUB_OUTPUT
+          else
+            echo "commit-msg=$PREPARED_MSG" >> $GITHUB_OUTPUT
+          fi
       - name: Publish to AUR
         uses: ./.github/actions/publish-to-aur
         with:
           pkgname: ${{ matrix.pkgname }}
-          commit-msg: ${{ steps.prep.outputs.commit-msg }}
+          commit-msg: ${{ steps.commitmsg.outputs.commit-msg }}
           new-pkgver: ${{ steps.pkg.outputs.new_pkgver }}
           new-pkgrel: ${{ steps.pkg.outputs.new_pkgrel }}
           commit-email: ${{ secrets.GIT_EMAIL }}
