@@ -89,11 +89,19 @@ jobs:
           PKGNAME: ${{ matrix.pkgname }}
           PREPARED_MSG: ${{ steps.prep.outputs.commit-msg }}
         run: |
-          ORIGINAL_MSG=$(echo "$PKGDATA" | jq -r --arg pkg "$PKGNAME" '.[$pkg] // ""')
+          ORIGINAL_MSG=$(echo "$PKGDATA" | jq -r --arg pkg "$PKGNAME" '.[$pkg] // ""' | head -1)
           if [ -n "$ORIGINAL_MSG" ]; then
-            echo "commit-msg=$ORIGINAL_MSG" >> $GITHUB_OUTPUT
+            {
+                echo "commit-msg<<EOF"
+                echo "$ORIGINAL_MSG"
+                echo "EOF"
+            } >> $GITHUB_OUTPUT
           else
-            echo "commit-msg=$PREPARED_MSG" >> $GITHUB_OUTPUT
+            {
+                echo "commit-msg<<EOF"
+                echo "$PREPARED_MSG"
+                echo "EOF"
+            } >> $GITHUB_OUTPUT
           fi
       - name: Publish to AUR
         uses: ./.github/actions/publish-to-aur
