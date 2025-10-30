@@ -47,7 +47,7 @@ jobs:
             arch1=${entry%%:*}
             arch2=${entry#*:}
 
-            url=$(curl -ILs -o /dev/null -w %{url_effective} https://update.code.visualstudio.com/latest/linux-${arch1}/insider)
+            url=$(curl -ILs -o /dev/null -w %{url_effective} 'https://code.visualstudio.com/sha/download?build=insider&os=linux-'${arch1})
             version=$(IFS='/' read -ra ADDR <<< $(echo "${url}"); echo "${ADDR[7]}" | sed "s/code-insider-${arch1}-//g" | sed 's/.tar.gz//g' | sed 's/-/./g')
             if [ -z "$version" ]; then
               echo "::error ::No version found from ${url}"
