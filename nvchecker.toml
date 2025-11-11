@@ -115,7 +115,7 @@ use_commit = true
 [transmission-cli-beta]
 source = "regex"
 url = "https://transmissionbt.com/download.html"
-regex = 'transmission-([\d\.]+-beta\.[\d]+\+[a-z0-9]+)'
+regex = 'transmission-([\d\.]+-beta\.[\d]+)'
 from_pattern = '-beta'
 to_pattern = 'beta'
 
