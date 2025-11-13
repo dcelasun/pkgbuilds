@@ -28,10 +28,10 @@
       "url": "https://github.com/Athou/commafeed/releases/tag/5.11.1"
     },
     "downlords-faf-client": {
-      "version": "2025.11.0",
-      "gitref": "refs/tags/v2025.11.0",
-      "revision": "48656286a93ba38a4eff0a65d9cb9e55dd9a6f38",
-      "url": "https://github.com/FAForever/downlords-faf-client/releases/tag/v2025.11.0"
+      "version": "2025.11.1",
+      "gitref": "refs/tags/v2025.11.1",
+      "revision": "54566951acd2b968b9a5f55bbc7f7fb1922b6768",
+      "url": "https://github.com/FAForever/downlords-faf-client/releases/tag/v2025.11.1"
     },
     "firefox-vaapi": {
       "version": "145.0"
