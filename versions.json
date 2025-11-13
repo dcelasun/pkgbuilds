@@ -101,10 +101,10 @@
       "version": "24.2.0"
     },
     "visual-studio-code-bin": {
-      "version": "1.105.1",
-      "gitref": "refs/tags/1.105.1",
-      "revision": "7d842fb85a0275a4a8e4d7e040d2625abbf7f084",
-      "url": "https://github.com/microsoft/vscode/releases/tag/1.105.1"
+      "version": "1.106.0",
+      "gitref": "refs/tags/1.106.0",
+      "revision": "ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57",
+      "url": "https://github.com/microsoft/vscode/releases/tag/1.106.0"
     },
     "writerscafe": {
       "version": "2.44"
