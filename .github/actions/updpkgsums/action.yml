@@ -60,7 +60,7 @@ runs:
         fi
     - name: updpkgsums and generate .SRCINFO
       id: updpkgsums
-      uses: heyhusen/archlinux-package-action@04303ce8da27317c34f00ea0a2c61ee0eed65ee3 # v2.4.0
+      uses: dcelasun/archlinux-package-action@e1e4d1e4acef0660656bb748c5547fed2ba75668 # Temporary fork, see https://github.com/heyhusen/archlinux-package-action/pull/60
       with:
         path: ${{ inputs.pkgname }}
         updpkgsums: true
