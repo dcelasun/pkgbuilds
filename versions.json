@@ -55,10 +55,10 @@
       "url": "https://github.com/pgaskin/kepubify/releases/tag/v4.0.4"
     },
     "kodi-nfo-generator": {
-      "version": "0.0.18",
-      "gitref": "refs/tags/v0.0.18",
-      "revision": "ba6202ad57c2d61b5cf9fc335101d6b917512463",
-      "url": "https://github.com/fracpete/kodi-nfo-generator/releases/tag/v0.0.18"
+      "version": "0.0.19",
+      "gitref": "refs/tags/v0.0.19",
+      "revision": "82a07a4bf18f3befe07d61e523eaa337f2e60c41",
+      "url": "https://github.com/fracpete/kodi-nfo-generator/releases/tag/v0.0.19"
     },
     "ksuid": {
       "version": "1.0.4",
