@@ -22,10 +22,10 @@
       "version": "1.2.3"
     },
     "commafeed": {
-      "version": "6.0.0",
-      "gitref": "refs/tags/6.0.0",
-      "revision": "2832e8c638e849371b8e7886dbb2880c2b34080d",
-      "url": "https://github.com/Athou/commafeed/releases/tag/6.0.0"
+      "version": "6.1.0",
+      "gitref": "refs/tags/6.1.0",
+      "revision": "2a0d935471be8fee477d2986f92d0703d97e8fb4",
+      "url": "https://github.com/Athou/commafeed/releases/tag/6.1.0"
     },
     "downlords-faf-client": {
       "version": "2026.1.0",
