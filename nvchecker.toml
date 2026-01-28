@@ -112,13 +112,6 @@ git = "https://github.com/dcelasun/transmission-exporter"
 release_url = "https://github.com/dcelasun/transmission-exporter/commit/__version__"
 use_commit = true
 
-[transmission-cli-beta]
-source = "regex"
-url = "https://transmissionbt.com/download.html"
-regex = 'transmission-([\d\.]+-beta\.[\d]+)'
-from_pattern = '-beta'
-to_pattern = 'beta'
-
 [unigine-tropics]
 source = "regex"
 url = "https://benchmark.unigine.com/tropics"
