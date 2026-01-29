@@ -95,16 +95,16 @@ github = "owntracks/frontend"
 use_max_tag = true
 prefix = "v"
 
-[paradox-launcher]
-source = "httpheader"
-url = "https://launcher.paradoxinteractive.com/v2/paradox-launcher-installer-linux"
-release_url = "https://www.paradoxinteractive.com/our-games/launcher"
-follow_redirects = false
-header = 'location'
-method = "HEAD"
-regex = 'paradox-launcher-installer-([\d_]+)\.deb'
-from_pattern = '_'
-to_pattern = '.'
+#[paradox-launcher]
+#source = "httpheader"
+#url = "https://launcher.paradoxinteractive.com/v2/paradox-launcher-installer-linux"
+#release_url = "https://www.paradoxinteractive.com/our-games/launcher"
+#follow_redirects = false
+#header = 'location'
+#method = "HEAD"
+#regex = 'paradox-launcher-installer-([\d_]+)\.deb'
+#from_pattern = '_'
+#to_pattern = '.'
 
 [prometheus-transmission-exporter-git]
 source = "git"
