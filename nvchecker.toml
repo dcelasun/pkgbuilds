@@ -137,8 +137,3 @@ use_latest_tag = true
 source = "regex"
 url = "http://www.anthemion.co.uk/writerscafe/download.htm"
 regex = 'WritersCafe-([\d.]+)-ubuntu-x86_64\.tar\.gz'
-
-[xerox-phaser-3040]
-source = "regex"
-url = "https://www.support.xerox.com/en-in/product/phaser-3040/downloads?language=en_GB&platform=linux"
-regex = 'Xerox-Phaser-3010_3040-([\d.]+)-[\d]+\.i586\.zip'
