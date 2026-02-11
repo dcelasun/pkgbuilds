@@ -11,6 +11,9 @@
     },
     "snowflake-odbc": {
       "version": "3.15.0"
+    },
+    "xerox-phaser-3040": {
+      "version": "1.0"
     }
   }
 }
