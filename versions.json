@@ -92,10 +92,10 @@
       "version": "1.3"
     },
     "unrpyc": {
-      "version": "2.0.3",
-      "gitref": "refs/tags/v2.0.3",
-      "revision": "b6cfa8e9732e0565ae149fcab6ca851b60600c5a",
-      "url": "https://github.com/CensoredUsername/unrpyc/releases/tag/v2.0.3"
+      "version": "2.0.4",
+      "gitref": "refs/tags/v2.0.4",
+      "revision": "3ae8334ed71a05535927dcc559663d3aca51215b",
+      "url": "https://github.com/CensoredUsername/unrpyc/releases/tag/v2.0.4"
     },
     "vertica-client": {
       "version": "24.2.0"
