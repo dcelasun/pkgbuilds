@@ -59,12 +59,6 @@ encoding = "utf-8"
 filter = '.IIU[0].version'
 release_url = "https://www.jetbrains.com/idea/download/?section=linux"
 
-[jet]
-source = "regex"
-url = "https://docs.cloudbees.com/docs/cloudbees-codeship/latest/pro-jet-cli/installation"
-release_url = "https://docs.cloudbees.com/docs/cloudbees-codeship/latest/pro-jet-cli/release-notes"
-regex = 'jet-linux_amd64_([\d.]+)\.tar\.gz'
-
 [kepubify-bin]
 source = "github"
 github = "pgaskin/kepubify"

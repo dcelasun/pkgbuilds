@@ -45,9 +45,6 @@
     "intellij-idea-ultimate-edition": {
       "version": "2025.3.3"
     },
-    "jet": {
-      "version": "2.15.0"
-    },
     "kepubify-bin": {
       "version": "4.0.4",
       "gitref": "refs/tags/v4.0.4",
