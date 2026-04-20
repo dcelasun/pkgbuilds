@@ -86,7 +86,7 @@ jobs:
             version=$(echo "$nvcmp_output" | jq -r '.[] | select(.name=="'${pkg}'").newver')
             expr=$(printf '."%s"' "$pkg")
             src=$(tomlq -r ${expr}.source nvchecker.toml)
-            if [ -z "$src" ]; then
+            if [ "$src" == 'null' ]; then
               src=$(tomlq -r ${expr}.source nvchecker_flaky.toml)
             fi
 
@@ -94,12 +94,12 @@ jobs:
             if [ "${src}" == "github" ]; then
               repo=$(tomlq -r ${expr}.github nvchecker.toml)
               pfx=$(tomlq -r ${expr}.prefix nvchecker.toml)
-              if [ -z "$repo" ]; then
+              if [ "$repo" == 'null' ]; then
                 repo=$(tomlq -r ${expr}.github nvchecker_flaky.toml)
                 pfx=$(tomlq -r ${expr}.prefix nvchecker_flaky.toml)
-                if [ "${pfx}" == "null" ]; then
-                  pfx=""
-                fi
+              fi
+              if [ "${pfx}" == "null" ]; then
+                pfx=""
               fi
               url=$(printf "https://github.com/${repo}/releases/tag/${pfx}${version}")
             else
