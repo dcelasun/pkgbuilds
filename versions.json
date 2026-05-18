@@ -42,6 +42,10 @@
       "revision": "8b37f14162043f908949f1b363d061dc9ba713c0",
       "url": "https://github.com/golangci/golangci-lint/releases/tag/v1.64.8"
     },
+    "gogh-git": {
+      "version": "4dc3618b1a650c4116b80b215d4e59203a6718a5",
+      "revision": "4dc3618b1a650c4116b80b215d4e59203a6718a5"
+    },
     "intellij-idea-ultimate-edition": {
       "version": "2026.1.2"
     },

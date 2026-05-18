@@ -52,6 +52,12 @@ use_max_tag = true
 include_regex = '^v1\.[\d.]+$'
 prefix = "v"
 
+[gogh-git]
+source = "git"
+git = "https://github.com/Gogh-Co/Gogh"
+release_url = "https://github.com/Gogh-Co/Gogh/commit/__version__"
+use_commit = true
+
 [intellij-idea-ultimate-edition]
 source = "jq"
 url = "https://data.services.jetbrains.com/products/releases?code=IIU&latest=true&type=release&build="
