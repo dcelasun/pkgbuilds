@@ -13,10 +13,10 @@
       "revision": "705e8d965d315eefe5916050d9d5353a4bab06ba"
     },
     "aws-nuke-bin": {
-      "version": "3.64.2",
-      "gitref": "refs/tags/v3.64.2",
-      "revision": "7e3e3d9bf35ef87d381ef3b48ee96969d744d350",
-      "url": "https://github.com/ekristen/aws-nuke/releases/tag/v3.64.2"
+      "version": "3.64.4",
+      "gitref": "refs/tags/v3.64.4",
+      "revision": "4a5a004edd67fbbc9aab475171784dce32b9a63f",
+      "url": "https://github.com/ekristen/aws-nuke/releases/tag/v3.64.4"
     },
     "basemark": {
       "version": "1.2.3"
@@ -36,15 +36,15 @@
     "firefox-vaapi": {
       "version": "151.0"
     },
+    "gogh-git": {
+      "version": "4dc3618b1a650c4116b80b215d4e59203a6718a5",
+      "revision": "4dc3618b1a650c4116b80b215d4e59203a6718a5"
+    },
     "golangci-lint-v1-bin": {
       "version": "1.64.8",
       "gitref": "refs/tags/v1.64.8",
       "revision": "8b37f14162043f908949f1b363d061dc9ba713c0",
       "url": "https://github.com/golangci/golangci-lint/releases/tag/v1.64.8"
-    },
-    "gogh-git": {
-      "version": "4dc3618b1a650c4116b80b215d4e59203a6718a5",
-      "revision": "4dc3618b1a650c4116b80b215d4e59203a6718a5"
     },
     "intellij-idea-ultimate-edition": {
       "version": "2026.1.2"
