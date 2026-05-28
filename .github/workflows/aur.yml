@@ -21,7 +21,7 @@ jobs:
       new-versions-flaky: ${{ steps.nvcheck.outputs.new_versions_flaky }}
     steps:
       - name: Clone repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: ${{ github.head_ref }}
           ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
@@ -152,7 +152,7 @@ jobs:
           echo "pkgrel=1" >> $GITHUB_OUTPUT
           echo "url=$url" >> $GITHUB_OUTPUT
       - name: Clone repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: ${{ github.head_ref }}
           ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
@@ -197,7 +197,7 @@ jobs:
           commit-email: ${{ secrets.GIT_EMAIL }}
           commit-user: ${{ secrets.GIT_USER }}
       - name: Create PR
-        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         id: pr
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
