@@ -22,10 +22,10 @@ optdepends=('glib2: Needed for move to trash functionality'
             'org.freedesktop.secrets: Needed for settings sync'
              # See https://github.com/MicrosoftDocs/live-share/issues/4650
             'icu69: Needed for live share' )
-source=(local://code.desktop.in
-        local://code-url-handler.desktop.in
-        local://code-workspace.xml.in
-        local://${_pkgname}-bin.sh)
+source=(code.desktop.in
+        code-url-handler.desktop.in
+        code-workspace.xml.in
+        ${_pkgname}-bin.sh)
 source_x86_64=(code_x64_${pkgver}.tar.gz::https://update.code.visualstudio.com/${pkgver}/linux-x64/stable)
 source_aarch64=(code_arm64_${pkgver}.tar.gz::https://update.code.visualstudio.com/${pkgver}/linux-arm64/stable)
 source_armv7h=(code_armhf_${pkgver}.tar.gz::https://update.code.visualstudio.com/${pkgver}/linux-armhf/stable)
