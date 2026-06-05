@@ -37,7 +37,8 @@ package() {
   install -d "${pkgdir}/usr/bin"
   install -d "${pkgdir}/usr/share/licenses/${pkgname}"
 
-  ln -s "${pkgdir}"/usr/share/{code/resources/app,licenses/"${pkgname}"}/LICENSE.rtf
+  ln -s /usr/share/code/resources/app/LICENSE.rtf \
+    "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.rtf"
 
   # Launcher
   install -m755 "${srcdir}/${_pkgname}-bin.sh" "${pkgdir}/usr/bin/code"
