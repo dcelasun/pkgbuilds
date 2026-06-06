@@ -68,10 +68,10 @@
       "url": "https://github.com/segmentio/ksuid/releases/tag/v1.0.4"
     },
     "mullvad-socks5-proxy": {
-      "version": "0.0.2",
-      "gitref": "refs/tags/v0.0.2",
-      "revision": "2f1defe78430f838e1871e8bd310699ff73102fe",
-      "url": "https://github.com/dcelasun/mullvad-socks5-proxy/releases/tag/v0.0.2"
+      "version": "0.0.3",
+      "gitref": "refs/tags/v0.0.3",
+      "revision": "55d96a9fe689069a5fd2d19a6e1b301bd0002c47",
+      "url": "https://github.com/dcelasun/mullvad-socks5-proxy/releases/tag/v0.0.3"
     },
     "owntracks-frontend": {
       "version": "2.15.3",
