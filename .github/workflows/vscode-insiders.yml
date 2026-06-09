@@ -47,8 +47,10 @@ jobs:
             arch1=${entry%%:*}
             arch2=${entry#*:}
 
-            url=$(curl -ILs -o /dev/null -w %{url_effective} 'https://code.visualstudio.com/sha/download?build=insider&os=linux-'${arch1})
-            version=$(IFS='/' read -ra ADDR <<< $(echo "${url}"); echo "${ADDR[7]}" | sed "s/code-insider-${arch1}-//g" | sed 's/.tar.gz//g' | sed 's/-/./g')
+            url=$(curl -ILs -o /dev/null -w '%{url_effective}' "https://code.visualstudio.com/sha/download?build=insider&os=linux-deb-${arch1}")
+            file=${url##*/}        # code-insiders_1.124.0-1780966446_amd64.deb
+            version=${file##*-}    # 1780966446_amd64.deb
+            version=${version%%_*} # 1780966446
             if [ -z "$version" ]; then
               echo "::error ::No version found from ${url}"
               continue
@@ -58,7 +60,7 @@ jobs:
               version_new=$version
             fi
 
-            sed -i "s|^source_${arch2}=.*$|source_${arch2}=\(code_${arch1}_${version}\.tar\.gz::${url}\)|g" ${{ env.PKGNAME }}/PKGBUILD
+            sed -i "s|^source_${arch2}=.*$|source_${arch2}=\(code_${arch1}_${version}\.deb::${url}\)|g" ${{ env.PKGNAME }}/PKGBUILD
           done
 
           if [ -z "${version_new}" ]; then
