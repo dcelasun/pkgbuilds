@@ -45,14 +45,14 @@ jobs:
         uses: ./.github/actions/prepare-commit-msg
         id: prep
         with:
-          pkgname: ${{ env.PKGNAME }}
+          pkgname: ${{ inputs.pkgname }}
           new-pkgver: ${{ inputs.pkgver }}
           new-pkgrel: ${{ inputs.pkgrel }}
       - name: Update PKGBUILD and generate diff
         uses: ./.github/actions/updpkgsums
         id: update
         with:
-          pkgname: ${{ env.PKGNAME }}
+          pkgname: ${{ inputs.pkgname }}
           new-pkgver: ${{ inputs.pkgver }}
           new-pkgrel: ${{ inputs.pkgrel }}
           skip-makepkg: ${{ inputs.skip-makepkg }}
@@ -70,7 +70,7 @@ jobs:
         uses: ./.github/actions/publish-to-aur
         if: inputs.publish == 'yes'
         with:
-          pkgname: ${{ env.PKGNAME }}
+          pkgname: ${{ inputs.pkgname }}
           commit-msg: ${{ steps.prep.outputs.commit-msg }}
           new-pkgver: ${{ inputs.pkgver }}
           new-pkgrel: ${{ inputs.pkgrel }}
