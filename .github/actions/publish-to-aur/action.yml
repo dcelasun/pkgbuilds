@@ -50,12 +50,10 @@ runs:
           fi
         fi
     - name: Publish to AUR
-      uses: KSXGitHub/github-actions-deploy-aur@da03e160361ce01bf087e790b6ffd196d7dccff7 # v4.1.3
+      uses: KSXGitHub/github-actions-deploy-aur@c78b081c877582d314a208018e054ed5f8307235 # temporary, see https://github.com/KSXGitHub/github-actions-deploy-aur/pull/52
       with:
         pkgname: ${{ inputs.pkgname }}
-        pkgbuild: ./${{ inputs.pkgname }}/PKGBUILD
-        assets: |
-          ./${{ inputs.pkgname }}/*
+        asset_dir: ./${{ inputs.pkgname }}/
         post_process: |
           git config --global gpg.format ssh
           git config --global user.signingkey ~/.ssh/aur
