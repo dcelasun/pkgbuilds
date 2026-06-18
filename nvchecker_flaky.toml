@@ -21,6 +21,11 @@ url = "https://www.snowflake.com/en/developers/downloads/odbc/"
 regex = 'odbc\/linux\/[\d.]+\/snowflake_linux_x8664_odbc-([\d.]+)\.tgz'
 user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
 
+[vertica-client]
+source = "regex"
+url = "https://www.vertica.com/download/vertica/client-drivers/"
+regex = 'client_drivers\/[\d.x]+/[\d.-]+\/vertica-client-([\d.]+)(?:[\d-]+)\.x86_64\.tar\.gz'
+
 [xerox-phaser-3040]
 source = "regex"
 url = "https://www.support.xerox.com/en-in/product/phaser-3040/downloads?language=en_GB&platform=linux"

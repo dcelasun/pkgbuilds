@@ -12,6 +12,9 @@
     "snowflake-odbc": {
       "version": "3.17.0"
     },
+    "vertica-client": {
+      "version": "24.2.0"
+    },
     "xerox-phaser-3040": {
       "version": "1.0"
     }

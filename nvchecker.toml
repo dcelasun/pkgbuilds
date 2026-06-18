@@ -123,11 +123,6 @@ github = "CensoredUsername/unrpyc"
 use_max_tag = true
 prefix = "v"
 
-[vertica-client]
-source = "regex"
-url = "https://www.vertica.com/download/vertica/client-drivers/"
-regex = 'client_drivers\/[\d.x]+/[\d.-]+\/vertica-client-([\d.]+)(?:[\d-]+)\.x86_64\.tar\.gz'
-
 [visual-studio-code-bin]
 source = "httpheader"
 url = "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
