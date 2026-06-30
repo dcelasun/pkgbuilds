@@ -86,6 +86,12 @@
       "version": "a7872aa2975c7a95af680c51198f4a363e226c8f",
       "revision": "a7872aa2975c7a95af680c51198f4a363e226c8f"
     },
+    "richmond-council-rss": {
+      "version": "0.0.4",
+      "gitref": "refs/tags/v0.0.4",
+      "revision": "e6ef4d858188d7f7d99d56a116569e2d2e431799",
+      "url": "https://github.com/dcelasun/richmond-council-rss/releases/tag/v0.0.4"
+    },
     "transmission-cli-beta": {
       "version": "4.1.0beta.5"
     },

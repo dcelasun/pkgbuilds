@@ -112,6 +112,13 @@ git = "https://github.com/dcelasun/transmission-exporter"
 release_url = "https://github.com/dcelasun/transmission-exporter/commit/__version__"
 use_commit = true
 
+[richmond-council-rss]
+source = "github"
+github = "dcelasun/richmond-council-rss"
+use_max_tag = true
+prefix = "v"
+include_regex = '^v[\d.]+$'
+
 [unigine-tropics]
 source = "regex"
 url = "https://benchmark.unigine.com/tropics"
