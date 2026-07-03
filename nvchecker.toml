@@ -77,6 +77,13 @@ github = "fracpete/kodi-nfo-generator"
 use_max_tag = true
 prefix = "v"
 
+[knbud]
+source = "github"
+github = "dcelasun/knbud"
+use_max_tag = true
+prefix = "v"
+include_regex = '^v[\d.]+$'
+
 [ksuid]
 source = "github"
 github = "segmentio/ksuid"
