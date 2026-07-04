@@ -55,6 +55,12 @@
       "revision": "8e959eda11d783041fc03c1a8109275a27f2f2dc",
       "url": "https://github.com/pgaskin/kepubify/releases/tag/v4.0.4"
     },
+    "knbud": {
+      "version": "1.0.3",
+      "gitref": "refs/tags/v1.0.3",
+      "revision": "74558fef29d686a66dc6ed65e69390fcef315531",
+      "url": "https://github.com/dcelasun/knbud/releases/tag/v1.0.3"
+    },
     "kodi-nfo-generator": {
       "version": "0.1.0",
       "gitref": "refs/tags/v0.1.0",
