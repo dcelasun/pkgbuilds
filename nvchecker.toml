@@ -90,6 +90,14 @@ github = "segmentio/ksuid"
 use_max_tag = true
 prefix = "v"
 
+[mandrel-bin]
+source = "github"
+github = "graalvm/mandrel"
+use_max_tag = true
+include_regex = '^mandrel-25\.[\d.]+-Final$'
+from_pattern = 'mandrel-([\d.]+)-Final'
+to_pattern = '\1'
+
 [mullvad-socks5-proxy]
 source = "github"
 github = "dcelasun/mullvad-socks5-proxy"
