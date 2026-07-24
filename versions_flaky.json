@@ -10,7 +10,7 @@
       "version": "1.5.0"
     },
     "snowflake-odbc": {
-      "version": "3.18.0"
+      "version": "3.19.0"
     },
     "vertica-client": {
       "version": "24.2.0"
