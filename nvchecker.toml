@@ -133,6 +133,13 @@ git = "https://github.com/dcelasun/transmission-exporter"
 release_url = "https://github.com/dcelasun/transmission-exporter/commit/__version__"
 use_commit = true
 
+[reolink-cli-bin]
+source = "github"
+github = "reolink/reolink-cli"
+use_max_tag = true
+prefix = "v"
+include_regex = '^v[\d.]+$'
+
 [richmond-council-rss]
 source = "github"
 github = "dcelasun/richmond-council-rss"
