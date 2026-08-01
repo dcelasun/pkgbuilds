@@ -62,10 +62,10 @@
       "url": "https://github.com/dcelasun/knbud/releases/tag/v1.0.3"
     },
     "kodi-nfo-generator": {
-      "version": "0.1.0",
-      "gitref": "refs/tags/v0.1.0",
-      "revision": "1a93c29f71f7931a6206cc80de2bd6b4d5c3f0f4",
-      "url": "https://github.com/fracpete/kodi-nfo-generator/releases/tag/v0.1.0"
+      "version": "0.1.1",
+      "gitref": "refs/tags/v0.1.1",
+      "revision": "3a0463fb1b2a34b8ffc122e9d1ee49483c9a9f54",
+      "url": "https://github.com/fracpete/kodi-nfo-generator/releases/tag/v0.1.1"
     },
     "ksuid": {
       "version": "1.0.4",
