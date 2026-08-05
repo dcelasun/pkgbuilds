@@ -1,6 +1,6 @@
 pkgbase = visual-studio-code-insiders-bin
 	pkgdesc = Visual Studio Code Insiders (vscode): Editor for building and debugging modern web and cloud applications (official binary version)
-	pkgver = 1785886416
+	pkgver = 1785907063
 	pkgrel = 1
 	url = https://code.visualstudio.com/
 	install = visual-studio-code-insiders-bin.install
@@ -31,11 +31,11 @@ pkgbase = visual-studio-code-insiders-bin
 	options = !strip
 	source = visual-studio-code-insiders-bin.sh
 	sha256sums = bf8abef6671392bf1f11d203fd940cc44e764e9c6352be7799880535c2f15087
-	source_x86_64 = code_x64_1785886416.deb::https://vscode.download.prss.microsoft.com/dbazure/download/insider/f4850e0faa6aaab8894a7c08f56891c6cd2ec1f6/code-insiders_1.133.0-1785886416_amd64.deb
-	sha256sums_x86_64 = b010237a048c70bb6afb0855dffc68b0e14c72d2f31dacb869eaca0b05a83356
-	source_aarch64 = code_arm64_1785886402.deb::https://vscode.download.prss.microsoft.com/dbazure/download/insider/f4850e0faa6aaab8894a7c08f56891c6cd2ec1f6/code-insiders_1.133.0-1785886402_arm64.deb
-	sha256sums_aarch64 = dde97ee587e9bb8400f39216bf4814d7f3647c7d774da8ae4dbd4b45ad78b224
-	source_armv7h = code_armhf_1785886251.deb::https://vscode.download.prss.microsoft.com/dbazure/download/insider/f4850e0faa6aaab8894a7c08f56891c6cd2ec1f6/code-insiders_1.133.0-1785886251_armhf.deb
-	sha256sums_armv7h = 6689e00ab94b36c98fbc39ad1c29fb195861bb3d015a1426593ef13b75c6fe30
+	source_x86_64 = code_x64_1785907063.deb::https://vscode.download.prss.microsoft.com/dbazure/download/insider/d90b90332515fe87d3ea344cbd4b0ae405128e9a/code-insiders_1.133.0-1785907063_amd64.deb
+	sha256sums_x86_64 = 497e7d4162030f72f60fad1abee888472b2ec73eacca067e0e27d46edaf8cb10
+	source_aarch64 = code_arm64_1785907007.deb::https://vscode.download.prss.microsoft.com/dbazure/download/insider/d90b90332515fe87d3ea344cbd4b0ae405128e9a/code-insiders_1.133.0-1785907007_arm64.deb
+	sha256sums_aarch64 = 40e9b8883a6a4087c60cca1a42c33474d1e77106bdd8ef03cc04bbd97f0730ac
+	source_armv7h = code_armhf_1785906843.deb::https://vscode.download.prss.microsoft.com/dbazure/download/insider/d90b90332515fe87d3ea344cbd4b0ae405128e9a/code-insiders_1.133.0-1785906843_armhf.deb
+	sha256sums_armv7h = ee84f7800eb5350a079c2f71f700a18dcb294650ecda8b7e4ac67aa900fb4444
 
 pkgname = visual-studio-code-insiders-bin
