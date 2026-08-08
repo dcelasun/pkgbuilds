@@ -110,6 +110,12 @@ github = "alibaba/open-code-review"
 use_max_tag = true
 prefix = "v"
 
+[openscad-bosl2]
+source = "github"
+github = "BelfrySCAD/BOSL2"
+use_max_tag = true
+prefix = "v"
+
 [owntracks-frontend]
 source = "github"
 github = "owntracks/frontend"
