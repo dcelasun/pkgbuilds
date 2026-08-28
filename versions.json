@@ -37,8 +37,8 @@
       "version": "153.0.4"
     },
     "gogh-git": {
-      "version": "01cc6727cbbe40d7e73963ba3c0ed42320f322a7",
-      "revision": "01cc6727cbbe40d7e73963ba3c0ed42320f322a7"
+      "version": "c24a6e66b2e6f9efcb75e38439b88ef689bb5f5d",
+      "revision": "c24a6e66b2e6f9efcb75e38439b88ef689bb5f5d"
     },
     "golangci-lint-v1-bin": {
       "version": "1.64.8",
