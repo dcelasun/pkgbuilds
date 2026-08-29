@@ -74,9 +74,10 @@
       "url": "https://github.com/segmentio/ksuid/releases/tag/v1.0.4"
     },
     "mandrel-bin": {
-      "version": "25.0.4.0",
-      "gitref": "refs/tags/mandrel-25.0.4.0-Final",
-      "url": "https://github.com/graalvm/mandrel/releases/tag/mandrel-25.0.4.0-Final"
+      "version": "25.0.4.1",
+      "gitref": "refs/tags/mandrel-25.0.4.1-Final",
+      "url": "https://github.com/graalvm/mandrel/releases/tag/mandrel-25.0.4.1-Final",
+      "creation_time": "2026-08-28T18:23:04Z"
     },
     "mullvad-socks5-proxy": {
       "version": "0.0.4",
