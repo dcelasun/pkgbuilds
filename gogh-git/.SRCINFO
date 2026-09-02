@@ -1,6 +1,6 @@
 pkgbase = gogh-git
 	pkgdesc = Color Scheme for Gnome Terminal, Pantheon Terminal and Tilix
-	pkgver = 6f178c2bad5d86df38cdce120ff4a265864e4cee
+	pkgver = c938f5e1daaee9d7d5458c8139e25e236d9f19f8
 	pkgrel = 1
 	url = https://github.com/Gogh-Co/Gogh
 	arch = any
