@@ -111,10 +111,10 @@
       "revision": "a7872aa2975c7a95af680c51198f4a363e226c8f"
     },
     "reolink-cli-bin": {
-      "version": "0.16.1",
-      "gitref": "refs/tags/v0.16.1",
-      "revision": "b864b2a2a1eec39b7e1074233a19f2f8f8dde002",
-      "url": "https://github.com/reolink/reolink-cli/releases/tag/v0.16.1"
+      "version": "0.18.0",
+      "gitref": "refs/tags/v0.18.0",
+      "revision": "43ec62d69ac9df4c605f824b99001b45bacf6663",
+      "url": "https://github.com/reolink/reolink-cli/releases/tag/v0.18.0"
     },
     "richmond-council-rss": {
       "version": "0.0.5",
