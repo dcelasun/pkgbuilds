@@ -1,0 +1,4 @@
+[unigine-tropics]
+source = "regex"
+url = "https://benchmark.unigine.com/tropics"
+regex = 'assets\.unigine\.com\/d\/Unigine_Tropics-([\d.]+)\.run'

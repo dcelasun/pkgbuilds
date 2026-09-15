@@ -1,0 +1,6 @@
+[golangci-lint-v1-bin]
+source = "github"
+github = "golangci/golangci-lint"
+use_max_tag = true
+include_regex = '^v1\.[\d.]+$'
+prefix = "v"

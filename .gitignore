@@ -28,3 +28,5 @@
 /versions_new.json
 /versions_flaky_new.json
 /keyfile.toml
+/nvchecker_merged.toml
+/nvchecker_flaky_merged.toml

@@ -1,0 +1,5 @@
+[unrpyc]
+source = "github"
+github = "CensoredUsername/unrpyc"
+use_max_tag = true
+prefix = "v"

@@ -1,0 +1,5 @@
+[ksuid]
+source = "github"
+github = "segmentio/ksuid"
+use_max_tag = true
+prefix = "v"

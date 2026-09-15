@@ -1,0 +1,5 @@
+[kodi-nfo-generator]
+source = "github"
+github = "fracpete/kodi-nfo-generator"
+use_max_tag = true
+prefix = "v"

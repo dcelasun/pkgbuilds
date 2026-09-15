@@ -1,0 +1,4 @@
+[writerscafe]
+source = "regex"
+url = "http://www.anthemion.co.uk/writerscafe/download.htm"
+regex = 'WritersCafe-([\d.]+)-ubuntu-x86_64\.tar\.gz'

@@ -1,32 +1,3 @@
 [__config__]
 oldver = "versions_flaky.json"
 newver = "versions_flaky_new.json"
-
-[cloudquery-cli]
-source = "github"
-github = "cloudquery/cloudquery"
-use_max_release = true
-include_regex = '^cli-v[\d.]+$'
-prefix = "cli-v"
-
-[snowflake-client]
-source = "regex"
-url = "https://www.snowflake.com/en/developers/downloads/snowsql/"
-regex = 'snowsql\/bootstrap\/\d\.\d\/linux_x86_64\/snowsql-([\d.]+)-linux_x86_64\.bash'
-user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
-
-[snowflake-odbc]
-source = "regex"
-url = "https://www.snowflake.com/en/developers/downloads/odbc/"
-regex = 'odbc\/linux\/[\d.]+\/snowflake_linux_x8664_odbc-([\d.]+)\.tgz'
-user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
-
-[vertica-client]
-source = "regex"
-url = "https://www.vertica.com/download/vertica/client-drivers/"
-regex = 'client_drivers\/[\d.x]+/[\d.-]+\/vertica-client-([\d.]+)(?:[\d-]+)\.x86_64\.tar\.gz'
-
-[xerox-phaser-3040]
-source = "regex"
-url = "https://www.support.xerox.com/en-in/product/phaser-3040/downloads?language=en_GB&platform=linux"
-regex = 'Xerox-Phaser-3010_3040-([\d.]+)-[\d]+\.i586\.zip'

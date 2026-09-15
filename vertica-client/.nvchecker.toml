@@ -1,0 +1,4 @@
+[vertica-client]
+source = "regex"
+url = "https://www.vertica.com/download/vertica/client-drivers/"
+regex = 'client_drivers\/[\d.x]+/[\d.-]+\/vertica-client-([\d.]+)(?:[\d-]+)\.x86_64\.tar\.gz'

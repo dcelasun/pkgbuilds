@@ -1,0 +1,5 @@
+[basemark]
+source = "regex"
+url = "https://www.gpuscore.com/benchmarks/basemark-gpu/"
+encoding = "utf-8"
+regex = 'BasemarkGPU-linux-x64-([\d.]+)\.tar\.gz'

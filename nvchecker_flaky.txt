@@ -1,0 +1,5 @@
+cloudquery-cli
+snowflake-client
+snowflake-odbc
+vertica-client
+xerox-phaser-3040
