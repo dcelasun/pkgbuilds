@@ -1,5 +1,0 @@
-[prometheus-transmission-exporter-git]
-source = "git"
-git = "https://github.com/dcelasun/transmission-exporter"
-release_url = "https://github.com/dcelasun/transmission-exporter/commit/__version__"
-use_commit = true

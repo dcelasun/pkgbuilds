@@ -36,10 +36,6 @@
     "firefox-vaapi": {
       "version": "155.0.1"
     },
-    "gogh-git": {
-      "version": "17c7ccafd46caa0cfb90d73d939d38b25796d536",
-      "revision": "17c7ccafd46caa0cfb90d73d939d38b25796d536"
-    },
     "golangci-lint-v1-bin": {
       "version": "1.64.8",
       "gitref": "refs/tags/v1.64.8",
@@ -105,10 +101,6 @@
     },
     "paradox-launcher": {
       "version": "2026.6"
-    },
-    "prometheus-transmission-exporter-git": {
-      "version": "a7872aa2975c7a95af680c51198f4a363e226c8f",
-      "revision": "a7872aa2975c7a95af680c51198f4a363e226c8f"
     },
     "reolink-cli-bin": {
       "version": "0.19.0",

@@ -1,0 +1,137 @@
+name: Update rolling packages
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        type: string
+        required: false
+        description: "Only check this package (from rolling.txt)"
+      force-update:
+        type: choice
+        description: "Rebuild even without upstream changes, bumping pkgrel if pkgver is unchanged (requires package)"
+        default: 'no'
+        options:
+          - 'yes'
+          - 'no'
+  schedule:
+    # Github recommends avoiding full hours
+    # See https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#schedule
+    - cron: "12 * * * *" # Hourly at minute 12
+
+concurrency:
+  group: rolling
+  cancel-in-progress: false
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.detect.outputs.packages }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.ref }}
+      - name: Detect upstream changes
+        id: detect
+        env:
+          PACKAGE: ${{ inputs.package }}
+          FORCE: ${{ inputs.force-update || 'no' }}
+        run: |
+          args=()
+          if [ "$FORCE" == 'yes' ]; then
+            args+=(--force)
+          fi
+          if [ -n "$PACKAGE" ]; then
+            args+=("$PACKAGE")
+          fi
+
+          packages=$(./rolling.sh detect "${args[@]}")
+          if [ "$packages" == '[]' ]; then
+            echo "::notice ::No upstream changes found"
+          fi
+          echo "packages=$packages" >> $GITHUB_OUTPUT
+
+  update:
+    name: Update ${{ matrix.package }}
+    needs: detect
+    if: needs.detect.outputs.packages != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # One at a time, since each job pushes to the same branch
+      max-parallel: 1
+      matrix:
+        package: ${{ fromJSON(needs.detect.outputs.packages) }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.ref }}
+          ssh-key: ${{ secrets.SSH_KEY_PRIVATE }}
+      - name: Prepare PKGBUILD
+        id: prepare
+        env:
+          PKGNAME: ${{ matrix.package }}
+        run: |
+          echo "old_pkgver=$(awk -F= '$1 == "pkgver" {print $2; exit}' "${PKGNAME}/PKGBUILD")" >> $GITHUB_OUTPUT
+          ./rolling.sh prepare "$PKGNAME"
+      - name: Build package
+        uses: dcelasun/archlinux-package-action@e1e4d1e4acef0660656bb748c5547fed2ba75668 # Temporary fork, see https://github.com/heyhusen/archlinux-package-action/pull/60
+        with:
+          path: ${{ matrix.package }}
+          updpkgsums: true
+          srcinfo: false
+          namcap: false
+          aur: true
+          flags: '-cfs --noconfirm'
+      - name: Set pkgrel
+        id: version
+        env:
+          PKGNAME: ${{ matrix.package }}
+          OLD_PKGVER: ${{ steps.prepare.outputs.old_pkgver }}
+          FORCE: ${{ inputs.force-update || 'no' }}
+        run: |
+          ./rolling.sh finalize "$PKGNAME" "$OLD_PKGVER" "$FORCE" | tee -a $GITHUB_OUTPUT
+      # Generated after the build so .SRCINFO has the pkgver computed by pkgver()
+      - name: Generate .SRCINFO
+        uses: dcelasun/archlinux-package-action@e1e4d1e4acef0660656bb748c5547fed2ba75668 # Temporary fork, see https://github.com/heyhusen/archlinux-package-action/pull/60
+        with:
+          path: ${{ matrix.package }}
+          srcinfo: true
+          namcap: false
+          archlinux_keyring: false
+          flags: ''
+      - name: Prepare commit message
+        uses: ./.github/actions/prepare-commit-msg
+        id: prep
+        with:
+          pkgname: ${{ matrix.package }}
+          new-pkgver: ${{ steps.version.outputs.pkgver }}
+          new-pkgrel: ${{ steps.version.outputs.pkgrel }}
+      - name: Configure git and SSH
+        uses: ./.github/actions/configure-git-ssh
+        with:
+          ssh-priv-key: ${{ secrets.SSH_KEY_PRIVATE }}
+          commit-email: ${{ secrets.GIT_EMAIL }}
+          commit-user: ${{ secrets.GIT_USER }}
+      - name: Commit and push to Github
+        env:
+          PKGNAME: ${{ matrix.package }}
+          COMMIT_MSG: ${{ steps.prep.outputs.commit-msg }}
+        run: |
+          git add "$PKGNAME"
+          git commit -m "$COMMIT_MSG"
+          # Earlier jobs in the matrix may have pushed in the meantime
+          git pull --rebase
+          git push
+      - name: Publish to AUR
+        uses: ./.github/actions/publish-to-aur
+        with:
+          pkgname: ${{ matrix.package }}
+          commit-msg: ${{ steps.prep.outputs.commit-msg }}
+          new-pkgver: ${{ steps.version.outputs.pkgver }}
+          new-pkgrel: ${{ steps.version.outputs.pkgrel }}
+          commit-email: ${{ secrets.GIT_EMAIL }}
+          commit-user: ${{ secrets.GIT_USER }}
+          ssh-priv-key: ${{ secrets.SSH_KEY_PRIVATE }}

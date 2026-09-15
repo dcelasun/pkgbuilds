@@ -1,5 +1,0 @@
-[gogh-git]
-source = "git"
-git = "https://github.com/Gogh-Co/Gogh"
-release_url = "https://github.com/Gogh-Co/Gogh/commit/__version__"
-use_commit = true

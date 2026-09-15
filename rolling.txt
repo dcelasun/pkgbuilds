@@ -1,0 +1,6 @@
+aranet4-git
+gogh-git
+lightzone-git
+netsniff-ng-git
+prometheus-transmission-exporter-git
+visual-studio-code-insiders-bin
