@@ -122,6 +122,12 @@
       "revision": "825f6596cc2a735a2232ddb9723c664791ca8be7",
       "url": "https://github.com/dcelasun/richmond-council-rss/releases/tag/v0.0.5"
     },
+    "ssmtp": {
+      "version": "2.66",
+      "gitref": "refs/tags/v2.66",
+      "revision": "078ad4accc654d1dde0f97b6b7e981e6d8b57e05",
+      "url": "https://github.com/Project-OSS-Revival/ssmtp/releases/tag/v2.66"
+    },
     "transmission-cli-beta": {
       "version": "4.1.0beta.5"
     },
