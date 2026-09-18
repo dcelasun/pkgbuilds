@@ -19,6 +19,7 @@ jobs:
       urls: ${{ steps.nvcheck.outputs.urls }}
       new-versions: ${{ steps.nvcheck.outputs.new_versions }}
       new-versions-flaky: ${{ steps.nvcheck.outputs.new_versions_flaky }}
+      failures: ${{ steps.nvcheck.outputs.failures }}
     steps:
       - name: Clone repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -50,14 +51,18 @@ jobs:
         run: |
           ./nvchecker-merge.sh
 
+          # nvchecker keeps going when an individual check fails: the package is
+          # simply left out of the new versions file, so nvcmp ignores it and
+          # every other package is updated as usual. Failures are collected from
+          # the JSON log (stdout, while the human readable log stays on stderr)
+          # and reported by the report-failures job instead of aborting here.
+          fail_log=$(mktemp)
           nvcmp_output=''
           for file in nvchecker{,_flaky}_merged.toml; do
-            failures='--failures'
-            if [ "$file" == 'nvchecker_flaky_merged.toml' ]; then
-              failures=''
-            fi
+            log=$(mktemp)
+            docker exec "$(cat ${container_id})" nvchecker --tries 3 --logger both -k /pkgbuilds/keyfile.toml -c /pkgbuilds/${file} > "$log"
+            grep '^{' "$log" | jq -rs '[.[] | select(.level == "error" and has("name")) | {name, error: (.error // .event)}] | group_by(.name) | map("\(.[0].name)\t\(.[0].error)") | .[]' >> "$fail_log"
 
-            docker exec "$(cat ${container_id})" nvchecker ${failures} -k /pkgbuilds/keyfile.toml -c /pkgbuilds/${file}
             out=$(docker exec "$(cat ${container_id})" nvcmp -c /pkgbuilds/${file} -j)
             if [ -z "$out" ] || [ "$out" == '[]' ]; then
               echo "::notice ::No new versions found in ${file}"
@@ -65,11 +70,37 @@ jobs:
             nvcmp_output+=$out
           done
 
+          rm -f keyfile.toml # Only needed for the nvchecker command
+
+          # Warn about every failed check and let the report-failures job fail
+          # the run for the ones that are not known to be flaky.
+          hard_failures=()
+          if [ -s "$fail_log" ]; then
+            {
+              echo '### :warning: nvchecker failures'
+              echo
+              echo '| Package | Flaky | Error |'
+              echo '| --- | --- | --- |'
+            } >> $GITHUB_STEP_SUMMARY
+            while IFS=$'\t' read -r pkg err; do
+              flaky=yes
+              if ! grep -qx "$pkg" nvchecker_flaky.txt; then
+                flaky=no
+                hard_failures+=("$pkg")
+              fi
+              echo "::warning ::nvchecker failed for ${pkg}: ${err}"
+              echo "| ${pkg} | ${flaky} | ${err} |" >> $GITHUB_STEP_SUMMARY
+            done < "$fail_log"
+          fi
+          failures=$(printf '%s\n' "${hard_failures[@]}" | jq -Rnc '[inputs | select(length > 0)]')
+          echo "failures=$failures" >> $GITHUB_OUTPUT
+
           # Merge outputs from the loop
           nvcmp_output=$(echo "$nvcmp_output" | jq -cs 'add')
-
-          rm -f keyfile.toml # Only needed for the nvchecker command
-          if [ -z "$nvcmp_output" ] || [ "$nvcmp_output" == '[]' ]; then
+          if [ -z "$nvcmp_output" ] || [ "$nvcmp_output" == 'null' ]; then
+            nvcmp_output='[]'
+          fi
+          if [ "$nvcmp_output" == '[]' ]; then
               echo "::notice ::No new versions found"
           fi
 
@@ -81,37 +112,19 @@ jobs:
           new_versions_flaky=$(cat versions_flaky_new.json | jq -c)
           echo "new_versions_flaky=$new_versions_flaky" >> $GITHUB_OUTPUT
 
-          # Calculate release URLs
+          # Calculate release URLs. A package with an unexpected .nvchecker.toml
+          # gets no URL instead of taking the whole matrix down with it.
           urls=''
-          pkgs=$(echo "$nvcmp_output" | jq -c '[.[].name]')
-          while read -r pkg; do
-            version=$(echo "$nvcmp_output" | jq -r '.[] | select(.name=="'${pkg}'").newver')
-            expr=$(printf '."%s"' "$pkg")
-            config="${pkg}/.nvchecker.toml"
-            src=$(tomlq -r ${expr}.source "$config")
-
-            url=''
-            if [ "${src}" == "github" ]; then
-              repo=$(tomlq -r ${expr}.github "$config")
-              pfx=$(tomlq -r ${expr}.prefix "$config")
-              if [ "${pfx}" == "null" ]; then
-                pfx=""
-              fi
-              url=$(printf "https://github.com/${repo}/releases/tag/${pfx}${version}")
-            else
-              url=$(tomlq -r ${expr}.release_url "$config")
-              if [ "$url" == 'null' ]; then
-                url=$(tomlq -r ${expr}.url "$config")
-              fi
-              url=$(echo "$url" | sed 's/__version__/'${version}'/g')
-            fi
-
-            if [ "$url" == 'null' ]; then
+          mapfile -t changed < <(echo "$nvcmp_output" | jq -r '.[].name')
+          for pkg in "${changed[@]}"; do
+            version=$(echo "$nvcmp_output" | jq -r --arg pkg "$pkg" '.[] | select(.name == $pkg).newver')
+            url=$(./nvchecker-url.sh "$pkg" "$version" || true)
+            if [ -z "$url" ]; then
               url='None'
+              echo "::warning ::Could not determine the release URL for ${pkg}"
             fi
-
             urls+=$(echo "${pkg}=${url}" | jq -R './"=" | {key:first,value:last}')
-          done <<< "$(echo $pkgs | jq -r '.[]')"
+          done
 
           urls=$(echo "$urls" | jq -cs 'from_entries')
           echo "urls=$urls" >> $GITHUB_OUTPUT
@@ -212,3 +225,19 @@ jobs:
       - name: Stop nvchecker
         run: |
           docker rm -f "$(cat ${container_id})"
+
+  report-failures:
+    name: Report nvchecker failures
+    needs: define-matrix
+    # Runs alongside create-prs so a broken check is still reported without
+    # holding back the packages that did have an update.
+    if: needs.define-matrix.outputs.failures != '[]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail for packages that are not known to be flaky
+        run: |
+          mapfile -t failures < <(echo '${{ needs.define-matrix.outputs.failures }}' | jq -r '.[]')
+          for pkg in "${failures[@]}"; do
+            echo "::error ::nvchecker failed for ${pkg}, see the define-matrix job for the error"
+          done
+          exit 1
