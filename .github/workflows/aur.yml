@@ -123,10 +123,10 @@ jobs:
               url='None'
               echo "::warning ::Could not determine the release URL for ${pkg}"
             fi
-            urls+=$(echo "${pkg}=${url}" | jq -R './"=" | {key:first,value:last}')
+            urls+=$(jq -nc --arg pkg "$pkg" --arg url "$url" '{($pkg): $url}')
           done
 
-          urls=$(echo "$urls" | jq -cs 'from_entries')
+          urls=$(echo "$urls" | jq -cs 'add // {}')
           echo "urls=$urls" >> $GITHUB_OUTPUT
       - name: Stop nvchecker
         run: |
@@ -142,9 +142,6 @@ jobs:
       matrix:
         package: ${{ fromJSON(needs.define-matrix.outputs.packages) }}
     steps:
-      - name: Install yq
-        run: |
-          sudo apt-get -y install yq # needed for tomlq
       - name: Identify version and release URL
         id: identify
         run: |
