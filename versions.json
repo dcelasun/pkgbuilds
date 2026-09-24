@@ -114,9 +114,6 @@
       "revision": "825f6596cc2a735a2232ddb9723c664791ca8be7",
       "url": "https://github.com/dcelasun/richmond-council-rss/releases/tag/v0.0.5"
     },
-    "sindricad-beta": {
-      "version": "0.1.227"
-    },
     "ssmtp": {
       "version": "2.66",
       "gitref": "refs/tags/v2.66",

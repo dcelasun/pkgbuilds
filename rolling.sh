@@ -2,7 +2,8 @@
 #
 # Helper for the "Update rolling packages" workflow (.github/workflows/rolling.yml).
 # Rolling packages are listed in rolling.txt: -git packages, plus
-# visual-studio-code-insiders-bin which gets several upstream builds a day.
+# visual-studio-code-insiders-bin which gets several upstream builds a day and
+# sindricad-beta whose rolling "beta" release is rebuilt from main.
 #
 #   rolling.sh detect [--force] [pkgname]
 #       Print a JSON array of rolling packages with upstream changes. With a
@@ -20,6 +21,7 @@ repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$repo_dir"
 
 insiders_pkg=visual-studio-code-insiders-bin
+sindricad_pkg=sindricad-beta
 
 die() {
     echo "error: $*" >&2
@@ -77,6 +79,26 @@ insiders_changed() {
     [[ $version != "$(pkgbuild_var "$insiders_pkg" pkgver)" ]]
 }
 
+# The beta tag is fixed, the version is only in the updater manifest
+sindricad_version() {
+    curl -fsSL https://github.com/MakerViking/sindricad/releases/download/beta/latest.json | jq -r .version
+}
+
+sindricad_changed() {
+    local version
+    version=$(sindricad_version)
+    [[ $version =~ ^[0-9.]+$ ]] || die "$sindricad_pkg: no version found"
+    [[ $version != "$(pkgbuild_var "$sindricad_pkg" pkgver)" ]]
+}
+
+changed() {
+    case $1 in
+        "$insiders_pkg") insiders_changed ;;
+        "$sindricad_pkg") sindricad_changed ;;
+        *) git_changed "$1" ;;
+    esac
+}
+
 cmd_detect() {
     local force=no pkg pkgs=() changed=()
 
@@ -96,9 +118,7 @@ cmd_detect() {
     for pkg in "${pkgs[@]}"; do
         if [[ $force == yes ]]; then
             echo "$pkg: forced" >&2
-        elif [[ $pkg == "$insiders_pkg" ]] && insiders_changed; then
-            echo "$pkg: changed" >&2
-        elif [[ $pkg != "$insiders_pkg" ]] && git_changed "$pkg"; then
+        elif changed "$pkg"; then
             echo "$pkg: changed" >&2
         else
             echo "$pkg: up to date" >&2
@@ -112,6 +132,13 @@ cmd_detect() {
 
 cmd_prepare() {
     local pkg=${1:?package name required} entry arch_deb arch_pkg url version new_version=''
+
+    if [[ $pkg == "$sindricad_pkg" ]]; then
+        version=$(sindricad_version)
+        [[ $version =~ ^[0-9.]+$ ]] || die "$pkg: no version found"
+        sed -i "s|^pkgver=.*$|pkgver=${version}|" "$pkg/PKGBUILD"
+        return 0
+    fi
 
     [[ $pkg == "$insiders_pkg" ]] || return 0
 
