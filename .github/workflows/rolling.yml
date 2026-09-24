@@ -78,6 +78,9 @@ jobs:
           ./rolling.sh prepare "$PKGNAME"
       - name: Build package
         uses: dcelasun/archlinux-package-action@e1e4d1e4acef0660656bb748c5547fed2ba75668 # Temporary fork, see https://github.com/heyhusen/archlinux-package-action/pull/60
+        env:
+          # The built package is thrown away, so skip compression
+          PKGEXT: '.pkg.tar'
         with:
           path: ${{ matrix.package }}
           updpkgsums: true
