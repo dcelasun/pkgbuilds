@@ -8,9 +8,9 @@
       "url": "https://github.com/awslabs/amazon-ecr-credential-helper/releases/tag/v0.12.0"
     },
     "aranet4": {
-      "version": "0.15.1",
-      "gitref": "refs/tags/v0.15.1",
-      "revision": "09852c158b9ef71b79aabad53fde3dbed85e1b0d"
+      "version": "0.15.2",
+      "gitref": "refs/tags/v0.15.2",
+      "revision": "258bf24a30ad4602c16c2df4373d7c848b3db992"
     },
     "aws-nuke-bin": {
       "version": "3.68.2",
