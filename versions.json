@@ -13,10 +13,10 @@
       "revision": "258bf24a30ad4602c16c2df4373d7c848b3db992"
     },
     "aws-nuke-bin": {
-      "version": "3.68.2",
-      "gitref": "refs/tags/v3.68.2",
-      "revision": "6a9b672d73aec50cebef8cac3d9aaa83278ce6ad",
-      "url": "https://github.com/ekristen/aws-nuke/releases/tag/v3.68.2"
+      "version": "3.68.3",
+      "gitref": "refs/tags/v3.68.3",
+      "revision": "d7e7d673def05cabc6fcf7520b7e5bd976332c76",
+      "url": "https://github.com/ekristen/aws-nuke/releases/tag/v3.68.3"
     },
     "basemark": {
       "version": "1.2.3"
