@@ -37,7 +37,7 @@
       "version": "2.6.1"
     },
     "firefox-vaapi": {
-      "version": "158.0"
+      "version": "158.0.1"
     },
     "golangci-lint-v1-bin": {
       "version": "1.64.8",
