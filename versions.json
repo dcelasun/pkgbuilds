@@ -122,11 +122,6 @@
       "revision": "825f6596cc2a735a2232ddb9723c664791ca8be7",
       "url": "https://github.com/dcelasun/richmond-council-rss/releases/tag/v0.0.5"
     },
-    "scad2step": {
-      "version": "0.1.3",
-      "url": "https://pypi.org/project/scad2step/0.1.3/",
-      "creation_time": "2026-08-24T01:01:54.621175Z"
-    },
     "ssmtp": {
       "version": "2.66",
       "gitref": "refs/tags/v2.66",
