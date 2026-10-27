@@ -50,7 +50,7 @@ runs:
           fi
         fi
     - name: Publish to AUR
-      uses: KSXGitHub/github-actions-deploy-aur@c78b081c877582d314a208018e054ed5f8307235 # temporary, see https://github.com/KSXGitHub/github-actions-deploy-aur/pull/52
+      uses: KSXGitHub/github-actions-deploy-aur@084b0d9b15415bf9cdb65d44dad1efe37a354050 # v4.2.0
       with:
         pkgname: ${{ inputs.pkgname }}
         asset_dir: ./${{ inputs.pkgname }}/
