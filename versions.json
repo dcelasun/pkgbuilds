@@ -105,6 +105,11 @@
     "paradox-launcher": {
       "version": "2026.13"
     },
+    "python-scad123d": {
+      "version": "0.8.0",
+      "url": "https://pypi.org/project/scad123d/0.8.0/",
+      "creation_time": "2026-09-15T20:26:25.713732Z"
+    },
     "reolink-cli-bin": {
       "version": "0.20.0",
       "gitref": "refs/tags/v0.20.0",
