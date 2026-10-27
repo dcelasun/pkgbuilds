@@ -3,5 +3,6 @@ gogh-git
 lightzone-git
 netsniff-ng-git
 prometheus-transmission-exporter-git
+python-scad123d-git
 sindricad-beta
 visual-studio-code-insiders-bin
