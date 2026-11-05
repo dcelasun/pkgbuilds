@@ -91,10 +91,10 @@
       "url": "https://github.com/alibaba/open-code-review/releases/tag/v1.13.6"
     },
     "openscad-bosl2": {
-      "version": "2.0.783",
-      "gitref": "refs/tags/v2.0.783",
-      "revision": "2d23674aeb9509ec57e740d648b22ca966fb7afc",
-      "url": "https://github.com/BelfrySCAD/BOSL2/releases/tag/v2.0.783"
+      "version": "2.0.784",
+      "gitref": "refs/tags/v2.0.784",
+      "revision": "35262999f4ca32715fdb7ac51fc9cf804a67b0a9",
+      "url": "https://github.com/BelfrySCAD/BOSL2/releases/tag/v2.0.784"
     },
     "owntracks-frontend": {
       "version": "2.15.3",
