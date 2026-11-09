@@ -49,10 +49,10 @@
       "version": "2026.3"
     },
     "kepubify-bin": {
-      "version": "4.0.4",
-      "gitref": "refs/tags/v4.0.4",
-      "revision": "8e959eda11d783041fc03c1a8109275a27f2f2dc",
-      "url": "https://github.com/pgaskin/kepubify/releases/tag/v4.0.4"
+      "version": "5.0.0",
+      "gitref": "refs/tags/v5.0.0",
+      "revision": "29f338fe1239f3aa61e9df606fe3c5b9bda30362",
+      "url": "https://github.com/pgaskin/kepubify/releases/tag/v5.0.0"
     },
     "knbud": {
       "version": "1.0.3",
