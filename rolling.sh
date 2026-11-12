@@ -8,6 +8,8 @@
 #   rolling.sh detect [--force] [pkgname]
 #       Print a JSON array of rolling packages with upstream changes. With a
 #       pkgname, only that package is checked; --force includes it regardless.
+#       A package whose check fails is skipped so the others still update; the
+#       JSON is printed anyway and the exit status is 3.
 #   rolling.sh prepare <pkgname>
 #       Update the PKGBUILD of packages whose version isn't computed by
 #       pkgver(). Run before makepkg.
@@ -23,9 +25,10 @@ cd "$repo_dir"
 insiders_pkg=visual-studio-code-insiders-bin
 sindricad_pkg=sindricad-beta
 
+# Exit 2, not 1, so detect can tell a failed check from "up to date"
 die() {
     echo "error: $*" >&2
-    exit 1
+    exit 2
 }
 
 pkgbuild_var() {
@@ -61,8 +64,14 @@ git_changed() {
     [[ $remote != "${BASH_REMATCH[1]}"* ]]
 }
 
+# Retry transient failures, and fail instead of returning the unredirected
+# URL if the endpoint doesn't send us to a .deb.
 insiders_url() {
-    curl -ILs -o /dev/null -w '%{url_effective}' "https://code.visualstudio.com/sha/download?build=insider&os=linux-deb-$1"
+    local url
+    url=$(curl -fsSIL --retry 3 --retry-all-errors -o /dev/null -w '%{url_effective}' \
+        "https://code.visualstudio.com/sha/download?build=insider&os=linux-deb-$1") || return
+    [[ $url == *.deb ]] || { echo "error: $insiders_pkg: $1 download did not redirect to a .deb: $url" >&2; return 1; }
+    echo "$url"
 }
 
 # code-insiders_1.124.0-1780966446_amd64.deb -> 1780966446
@@ -73,15 +82,16 @@ insiders_version() {
 }
 
 insiders_changed() {
-    local version
-    version=$(insiders_version "$(insiders_url x64)")
-    [[ $version =~ ^[0-9]+$ ]] || die "$insiders_pkg: no version found"
+    local url version
+    url=$(insiders_url x64) || die "$insiders_pkg: could not resolve download URL"
+    version=$(insiders_version "$url")
+    [[ $version =~ ^[0-9]+$ ]] || die "$insiders_pkg: no version found in $url"
     [[ $version != "$(pkgbuild_var "$insiders_pkg" pkgver)" ]]
 }
 
 # The beta tag is fixed, the version is only in the updater manifest
 sindricad_version() {
-    curl -fsSL https://github.com/MakerViking/sindricad/releases/download/beta/latest.json | jq -r .version
+    curl -fsSL --retry 3 --retry-all-errors https://github.com/MakerViking/sindricad/releases/download/beta/latest.json | jq -r .version
 }
 
 sindricad_changed() {
@@ -100,7 +110,7 @@ changed() {
 }
 
 cmd_detect() {
-    local force=no pkg pkgs=() changed=()
+    local force=no pkg status pkgs=() changed=() failed=()
 
     if [[ ${1:-} == --force ]]; then
         force=yes
@@ -118,16 +128,32 @@ cmd_detect() {
     for pkg in "${pkgs[@]}"; do
         if [[ $force == yes ]]; then
             echo "$pkg: forced" >&2
-        elif changed "$pkg"; then
-            echo "$pkg: changed" >&2
-        else
-            echo "$pkg: up to date" >&2
+            changed+=("$pkg")
             continue
         fi
-        changed+=("$pkg")
+
+        # Subshell so a die() only ends this package's check
+        status=0
+        (changed "$pkg") || status=$?
+        case $status in
+            0)
+                echo "$pkg: changed" >&2
+                changed+=("$pkg")
+                ;;
+            1) echo "$pkg: up to date" >&2 ;;
+            *)
+                echo "$pkg: check failed, skipping" >&2
+                failed+=("$pkg")
+                ;;
+        esac
     done
 
     printf '%s\n' "${changed[@]}" | jq -Rnc '[inputs | select(length > 0)]'
+
+    if ((${#failed[@]})); then
+        echo "::error ::Could not check ${failed[*]} for upstream changes" >&2
+        return 3
+    fi
 }
 
 cmd_prepare() {
@@ -146,7 +172,7 @@ cmd_prepare() {
         arch_deb=${entry%%:*}
         arch_pkg=${entry#*:}
 
-        url=$(insiders_url "$arch_deb")
+        url=$(insiders_url "$arch_deb") || die "$pkg: could not resolve download URL for $arch_deb"
         version=$(insiders_version "$url")
         [[ $version =~ ^[0-9]+$ ]] || die "$pkg: no version found for $arch_deb in $url"
 

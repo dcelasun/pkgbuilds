@@ -46,16 +46,24 @@ jobs:
             args+=("$PACKAGE")
           fi
 
-          packages=$(./rolling.sh detect "${args[@]}")
+          # Exit status 3 means some checks failed but the rest are in
+          # $packages: write the output first so those still update, then fail
+          status=0
+          packages=$(./rolling.sh detect "${args[@]}") || status=$?
+          if [ "$status" -ne 0 ] && [ "$status" -ne 3 ]; then
+            exit "$status"
+          fi
           if [ "$packages" == '[]' ]; then
             echo "::notice ::No upstream changes found"
           fi
           echo "packages=$packages" >> $GITHUB_OUTPUT
+          exit "$status"
 
   update:
     name: Update ${{ matrix.package }}
     needs: detect
-    if: needs.detect.outputs.packages != '[]'
+    # Also run if detect failed after writing its output (some checks failed)
+    if: ${{ !cancelled() && needs.detect.outputs.packages != '' && needs.detect.outputs.packages != '[]' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
