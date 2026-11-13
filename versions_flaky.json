@@ -2,10 +2,10 @@
   "version": 2,
   "data": {
     "cloudquery-cli": {
-      "version": "6.50.0",
-      "gitref": "refs/tags/cli-v6.50.0",
-      "url": "https://github.com/cloudquery/cloudquery/releases/tag/cli-v6.50.0",
-      "creation_time": "2026-11-02T13:55:34Z"
+      "version": "6.51.0",
+      "gitref": "refs/tags/cli-v6.51.0",
+      "url": "https://github.com/cloudquery/cloudquery/releases/tag/cli-v6.51.0",
+      "creation_time": "2026-11-13T13:28:51Z"
     },
     "snowflake-client": {
       "version": "1.5.4"
