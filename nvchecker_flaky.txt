@@ -2,4 +2,5 @@ cloudquery-cli
 snowflake-client
 snowflake-odbc
 vertica-client
+unigine-tropics
 xerox-phaser-3040
