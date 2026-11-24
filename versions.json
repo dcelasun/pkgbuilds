@@ -85,10 +85,10 @@
       "url": "https://github.com/dcelasun/mullvad-socks5-proxy/releases/tag/v0.0.4"
     },
     "open-code-review": {
-      "version": "1.14.2",
-      "gitref": "refs/tags/v1.14.2",
-      "revision": "da9d2f7bc651e120d9d6a32ca1a4cb0c83056019",
-      "url": "https://github.com/alibaba/open-code-review/releases/tag/v1.14.2"
+      "version": "1.14.3",
+      "gitref": "refs/tags/v1.14.3",
+      "revision": "f3707652be45d5687c38b71469e9d507bdf31aba",
+      "url": "https://github.com/alibaba/open-code-review/releases/tag/v1.14.3"
     },
     "openscad-bosl2": {
       "version": "2.0.788",
